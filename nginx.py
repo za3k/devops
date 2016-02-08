@@ -8,10 +8,11 @@ import crypto
 
 def ensure():
     select_package("apt")
-    package_ensure(["nginx"]) # On debian will automatically be enabled
+    already_installed = package_ensure(["nginx"]) # On debian will automatically be enabled
     ensure_sites_available()
     put('config/nginx/nginx.conf', '/etc/nginx/nginx.conf')
     crypto.ensure_dhparams('/etc/ssl/dhparams-nginx.pem', size=4096)
+    return already_installed
 
 def ensure_sites_available():
     dir_ensure('/etc/nginx/sites-available')
@@ -32,6 +33,3 @@ def ensure_site(config_file, cert=None, key=None, enabled=True):
         crypto.put_key(key)
     if enabled:
         run("ln -s -f {config} /etc/nginx/sites-enabled".format(config=placed_config))
-
-def ensure_default():
-    ensure_site('config/nginx/default', cert='config/certs/za3k.com.pem', key='config/keys/blog.za3k.com.key')

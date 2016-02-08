@@ -13,11 +13,12 @@ env.use_ssh_config = True
 # fab -H deadtree
 def deadtree():
     sudo.ensure() # cuisine.package_ensure is broken otherwise
+
     # Set up nginx
-    new_install = nginx.ensure()
-    nginx.ensure_default()
-    if new_install:
-        nginx.reload() # IPv6 listener
+    already_installed = nginx.ensure()
+    nginx.ensure_site('config/nginx/default', cert='config/certs/za3k.com.pem', key='config/keys/blog.za3k.com.key')
+    if not already_installed:
+        nginx.restart() # IPv[46] listener only changes on restart
 
     # Load git repos, and if we're not the authority, pull
     # blog.za3k.com
