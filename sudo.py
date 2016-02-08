@@ -6,6 +6,7 @@ from fabric.api import run
 from cuisine import mode_user, select_package, package_ensure
 
 def ensure():
+    """Ensure the 'sudo' command is installed"""
     select_package("apt")
     with mode_user():
         package_ensure(["sudo"])

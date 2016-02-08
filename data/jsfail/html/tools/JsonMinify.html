@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8 />
+<title>JsFail - Json Minifier</title>
+<meta name="description" content="Minimize and validate your Json using this simple tool!">
+<meta name="keywords" content="JavaScript code easy lint validation json minimize minify">
+<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/css/bootstrap-combined.min.css" rel="stylesheet">
+<link href="/css/common.css" rel="stylesheet" type="text/css" />
+<link href="/css/codemirror.css" rel="stylesheet" type="text/css" />
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js"></script>
+<script src="/js/editor.js"></script>
+            <script src="/js/tools/JavaScriptFormat.js"></script>
+    <script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-38728237-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+</head>
+<body>
+  <div class="row" id="header">
+  <div class="navbar span12">
+    <div class="navbar-inner">
+      <a class="brand" href="/index.html"><span style="color:#006dcc;">Js</span>Fail</a>
+      <ul class="nav">
+        <li >
+          <a href="/index.html">Home</a>
+        </li>
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+            More JS Tools<b class="caret"></b>
+          </a>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                            <li >
+                  <a href="/tools/JavaScriptFormat.html">JavaScript Formatter</a>
+              </li>
+                            <li >
+                  <a href="/tools/JsonFormat.html">Json Formatter</a>
+              </li>
+                            <li >
+                  <a href="/tools/JsonLint.html">Json Lint</a>
+              </li>
+                            <li class="active">
+                  <a href="/tools/JsonMinify.html">Json Minifier</a>
+              </li>
+                            <li >
+                  <a href="/tools/WordCount.html">Word Count</a>
+              </li>
+                        </ul>
+        </li>
+        <li>
+          <a href="#contactModal" data-toggle="modal">Feedback/Contact</a>
+          <div id="contactModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+              <h3 id="myModalLabel">Feedback/Contact Info</h3>
+            </div>
+            <div class="modal-body">
+                <h4>Want to sing our praises or more likely file a bug? You can send us an email at <a href="mailto:info@jsfail.com">info@jsfail.com</a> or open an issue on our <a href="javascript:window.open('https://github.com/freethenation/JsFail/issues');">GitHub page</a>.</h4>
+            </div>
+            <div class="modal-footer">
+              <a href="javascript:void(0);" class="btn btn-primary" data-dismiss="modal">Close</a>
+            </div>
+          </div>
+        </li>
+                <li>
+          <a href="#thanksModal" data-toggle="modal">Special Thanks</a>
+          <div id="thanksModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+              <h3 id="myModalLabel">Special Thanks To</h3>
+            </div>
+            <div class="modal-body">
+              <ul>
+                              <li><a href="javascript:window.open('http://codemirror.net/');"><b>CodeMirror:</b> Providing an awesome text editor!</a></li>
+                              <li><a href="javascript:window.open('http://esprima.org/');"><b>Esprima:</b> Providing a very good JavaScript parser.</a></li>
+                              <li><a href="javascript:window.open('https://github.com/freethenation/durable-json-lint');"><b>FreeTheNation:</b> Providing an excellent Json lint library.</a></li>
+                            </ul>
+            </div>
+            <div class="modal-footer">
+              <a href="javascript:void(0);" class="btn btn-primary" data-dismiss="modal">Close</a>
+            </div>
+          </div>
+        </li>
+              </ul>
+    </div>
+  </div>
+</div>  <div class="row">
+    <div id="content" class="span10">
+              <div class="page-header">
+          <h2>Json Minifier</h2>
+          Simply paste Json into the textbox below and then click the minify button.        </div>
+            <div id="errorDiv" class="alert alert-error std-margin std-padding" style="visibility:hidden;"><b>Error: </b>There were some errors in the Json. They are marked in the source below.</div>
+<div id="editordiv">
+    <textarea id="editor" name="textarea"></textarea>
+</div>
+<script type="text/javascript">
+window.editor = null;
+$(document).ready(function(){
+    window.editor = CodeMirror.fromTextArea($("#editor")[0], $.extend({
+        lineNumbers: true,
+        tabMode: "indent",
+        matchBrackets:true
+    }, {"fill":true,"mode":"text/typescript"}));
+});
+</script><div class="row std-margin">
+    <button id="formatButton" class="offset3 span4 btn btn-primary">Minify Json</button>
+</div>
+<script type="text/javascript">
+CodeMirror.defineInitHook(function(editor){
+    var errorDiv = $("#errorDiv");
+    editor.on("change", jstools.debounce(function(){
+        jstools.clearErrors(editor, errorDiv);
+        var ast = jstools.parseJson(editor.getValue());
+        jstools.displayErrors(editor,ast,errorDiv);
+    }, 500))
+    $("#formatButton").click(jstools.debounce(function(){
+        jstools.clearErrors(editor, errorDiv);
+        var ast = jstools.prettyPrintJson(editor, "");
+        jstools.displayErrors(editor,ast,errorDiv);
+    },500,true))
+})
+</script>    </div>
+    <div class="span2">
+      
+    </div>
+  </div>
+</body>
+</html>

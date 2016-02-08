@@ -7,6 +7,7 @@ from cuisine import dir_ensure, select_package, package_ensure
 import crypto
 
 def ensure():
+    """Ensure nginx is installed"""
     select_package("apt")
     already_installed = package_ensure(["nginx"]) # On debian will automatically be enabled
     ensure_sites_available()
@@ -19,6 +20,7 @@ def ensure_sites_available():
     dir_ensure('/etc/nginx/sites-enabled')
 
 def restart():
+    """Restart nginx. Should only be neccesary on ipv[46] switch."""
     sudo("systemctl restart nginx")
 
 def reload():

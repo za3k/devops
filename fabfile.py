@@ -11,6 +11,7 @@ env.shell = '/bin/sh -c'
 env.use_ssh_config = True
 
 # fab -H deadtree
+# Run this on Debian 8
 def deadtree():
     sudo.ensure() # cuisine.package_ensure is broken otherwise
 
@@ -37,6 +38,8 @@ def deadtree():
     # irc.za3k.com -> irc
     #              -> webchat (qwebirc)
     # jsfail.com
+    nginx.ensure_site('config/nginx/jsfail.com')
+    put('data/jsfail','/usr/share/nginx/jsfail')
     # justusemake.com
     # library.za3k.com -> website
     #                  -> sync script

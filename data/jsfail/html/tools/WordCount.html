@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8 />
+<title>JsFail - Word Count</title>
+<meta name="description" content="Easily count the number of words in your document!">
+<meta name="keywords" content="easy format word count word count">
+<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/css/bootstrap-combined.min.css" rel="stylesheet">
+<link href="/css/common.css" rel="stylesheet" type="text/css" />
+<link href="/css/codemirror.css" rel="stylesheet" type="text/css" />
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js"></script>
+<script src="/js/editor.js"></script>
+    <script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-38728237-1']);
+_gaq.push(['_trackPageview']);
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+</script>
+</head>
+<body>
+  <div class="row" id="header">
+  <div class="navbar span12">
+    <div class="navbar-inner">
+      <a class="brand" href="/index.html"><span style="color:#006dcc;">Js</span>Fail</a>
+      <ul class="nav">
+        <li >
+          <a href="/index.html">Home</a>
+        </li>
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+            More JS Tools<b class="caret"></b>
+          </a>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                            <li >
+                  <a href="/tools/JavaScriptFormat.html">JavaScript Formatter</a>
+              </li>
+                            <li >
+                  <a href="/tools/JsonFormat.html">Json Formatter</a>
+              </li>
+                            <li >
+                  <a href="/tools/JsonLint.html">Json Lint</a>
+              </li>
+                            <li >
+                  <a href="/tools/JsonMinify.html">Json Minifier</a>
+              </li>
+                            <li class="active">
+                  <a href="/tools/WordCount.html">Word Count</a>
+              </li>
+                        </ul>
+        </li>
+        <li>
+          <a href="#contactModal" data-toggle="modal">Feedback/Contact</a>
+          <div id="contactModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+              <h3 id="myModalLabel">Feedback/Contact Info</h3>
+            </div>
+            <div class="modal-body">
+                <h4>Want to sing our praises or more likely file a bug? You can send us an email at <a href="mailto:info@jsfail.com">info@jsfail.com</a> or open an issue on our <a href="javascript:window.open('https://github.com/freethenation/JsFail/issues');">GitHub page</a>.</h4>
+            </div>
+            <div class="modal-footer">
+              <a href="javascript:void(0);" class="btn btn-primary" data-dismiss="modal">Close</a>
+            </div>
+          </div>
+        </li>
+                <li>
+          <a href="#thanksModal" data-toggle="modal">Special Thanks</a>
+          <div id="thanksModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+              <h3 id="myModalLabel">Special Thanks To</h3>
+            </div>
+            <div class="modal-body">
+              <ul>
+                              <li><a href="javascript:window.open('http://codemirror.net/');"><b>CodeMirror:</b> Providing an awesome text editor!</a></li>
+                            </ul>
+            </div>
+            <div class="modal-footer">
+              <a href="javascript:void(0);" class="btn btn-primary" data-dismiss="modal">Close</a>
+            </div>
+          </div>
+        </li>
+              </ul>
+    </div>
+  </div>
+</div>  <div class="row">
+    <div id="content" class="span10">
+              <div class="page-header">
+          <h2>Word Count</h2>
+          Simply paste text into the textbox below to get a word count.        </div>
+            <div class="row">
+    <div class="span10"><h5>
+        There are <strong id="wordcount">0</strong> words in the text document.
+    </h5></div>
+</div>
+<div id="editordiv">
+    <textarea id="editor" name="textarea"></textarea>
+</div>
+<script type="text/javascript">
+window.editor = null;
+$(document).ready(function(){
+    window.editor = CodeMirror.fromTextArea($("#editor")[0], $.extend({
+        lineNumbers: true,
+        tabMode: "indent",
+        matchBrackets:true
+    }, {"fill":true,"lineNumbers":false,"lineWrapping":true,"matchBrackets":false}));
+});
+</script><script type="text/javascript">
+CodeMirror.defineInitHook(function(editor){
+    editor.on("change", function(editor){
+        var matches = editor.getValue().match(/\S+/g);
+        $("#wordcount").text(matches ? matches.length : 0);
+    })
+})
+</script>    </div>
+    <div class="span2">
+      
+    </div>
+  </div>
+</body>
+</html>
