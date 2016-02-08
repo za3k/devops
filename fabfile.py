@@ -4,8 +4,8 @@ from __future__ import print_function
 
 from fabric.api import run, env, sudo, put, get, cd, settings, hosts
 import fabric.contrib.files
-
-import nginx, sudo
+from cuisine import dir_ensure, group_ensure, group_user_ensure, user_ensure
+import apt, nginx
 
 env.shell = '/bin/sh -c'
 env.use_ssh_config = True
@@ -13,7 +13,7 @@ env.use_ssh_config = True
 # fab -H deadtree
 # Run this on Debian 8
 def deadtree():
-    sudo.ensure() # cuisine.package_ensure is broken otherwise
+    apt.sudo_ensure() # cuisine.package_ensure is broken otherwise
 
     # Set up nginx
     already_installed = nginx.ensure()
@@ -38,8 +38,13 @@ def deadtree():
     # irc.za3k.com -> irc
     #              -> webchat (qwebirc)
     # jsfail.com
+    user_ensure('jsfail')
+    group_ensure('jsfail')
+    group_user_ensure('jsfail', 'jsfail')
     nginx.ensure_site('config/nginx/jsfail.com')
-    put('data/jsfail','/usr/share/nginx/jsfail')
+    put('data/jsfail', '/usr/share/nginx', mode='755')
+    sudo('chown -R jsfail:jsfail /usr/share/nginx')
+
     # justusemake.com
     # library.za3k.com -> website
     #                  -> sync script

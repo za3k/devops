@@ -13,6 +13,7 @@ def ensure():
     ensure_sites_available()
     put('config/nginx/nginx.conf', '/etc/nginx/nginx.conf')
     crypto.ensure_dhparams('/etc/ssl/dhparams-nginx.pem', size=4096)
+    dir_ensure("/usr/share/nginx", mode='1755') # make sure anyone can add a site
     return already_installed
 
 def ensure_sites_available():
@@ -24,6 +25,7 @@ def restart():
     sudo("systemctl restart nginx")
 
 def reload():
+    """Reload nginx and apply new configuration"""
     sudo("systemctl reload nginx")
 
 def ensure_site(config_file, cert=None, key=None, enabled=True):
