@@ -1,0 +1,59 @@
+#!/usr/bin/python2
+from __future__ import absolute_import
+from __future__ import print_function
+
+from fabric.api import run, env, sudo, put, get, cd, settings, hosts
+import fabric.contrib.files
+
+import nginx, sudo
+
+env.shell = '/bin/sh -c'
+env.use_ssh_config = True
+
+# fab -H deadtree
+def deadtree():
+    sudo.ensure() # cuisine.package_ensure is broken otherwise
+    # Set up nginx
+    new_install = nginx.ensure()
+    nginx.ensure_default()
+    if new_install:
+        nginx.reload() # IPv6 listener
+
+    # Load git repos, and if we're not the authority, pull
+    # blog.za3k.com
+    # colony on the moon
+    # email -> imap (dovecot)
+    #       -> smtp (postfix)
+    #       -> spamassassin
+    #       -> postgres
+    # etherpad.za3k.com
+    # forsale
+    # gipc daily sync
+    # github personal backup
+    # github repo list
+    #                  -> updater
+    # gmail backup
+    # irc.za3k.com -> irc
+    #              -> webchat (qwebirc)
+    # jsfail.com
+    # justusemake.com
+    # library.za3k.com -> website
+    #                  -> sync script
+    #                  -> card catalog
+    # logs (nginx) and analysis (analog)
+    # mint sync
+    # moreorcs.com
+    # nanowrimo.za3k.com
+    # nntp.za3k.com
+    # petchat.za3k.com
+    # publishing.za3k.com
+    # redis.za3k.com -> redis [disabled]
+    #                -> webdis
+    # status.za3k.com
+    # thinkingtropes.com [disabled]
+    # thisisashell.com [disabled]
+    # twitter archive
+    # vlad the remailer [disabled]
+    # za3k.com
+    # znc
+    nginx.reload()
