@@ -12,12 +12,15 @@ def ensure_git():
 def clone_github(target, repository, use_https=True):
     if use_https:
         remote="https://github.com/{repository}.git".format(repository=repository)
-    else
+    else:
         remote="git@github.com:{repository}.git".format(repository=repository)
     clone(target, remote)
 
-def clone_deadtree(target, repository):
-    remote="deadtree.xen.prgmr.com:/git/{repository}.git".format(repository=repository)
+def clone_deadtree(target, repository, use_https=True):
+    if use_https:
+        remote="https://git.za3k.com/{repository}.git".format(repository=repository)
+    else:
+        remote="deadtree.xen.prgmr.com:/git/{repository}.git".format(repository=repository)
     clone(target, remote)
 
 def clone(target, remote):

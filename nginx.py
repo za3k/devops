@@ -11,7 +11,8 @@ def ensure():
     select_package("apt")
     already_installed = package_ensure(["nginx"]) # On debian will automatically be enabled
     ensure_sites_available()
-    put('config/nginx/nginx.conf', '/etc/nginx/nginx.conf')
+    put('config/nginx/nginx.conf', '/etc/nginx')
+    put('config/nginx/fastcgi_params', '/etc/nginx')
     crypto.ensure_dhparams('/etc/ssl/dhparams-nginx.pem', size=4096)
     dir_ensure("/usr/share/nginx", mode='1755') # make sure anyone can add a site
     return already_installed
