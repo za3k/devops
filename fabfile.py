@@ -10,6 +10,18 @@ import apt, git, mx, nginx, ssh
 env.shell = '/bin/sh -c'
 env.use_ssh_config = True
 
+def avalanche():
+    """Avalanche doesn't really run anything except the printserver, it's a point of presence."""
+    pass
+
+def burn():
+    """Burn is the backup machine and cannot be configured automatically for safety reasons.
+    It runs:
+        git.za3k.com: HTTPS access for cloning
+        burn.za3k.com: SCP access for backups and git commits
+    """
+    pass
+
 # fab -H corrupt corrupt
 # Run this on Debian 8
 def corrupt():
@@ -32,6 +44,7 @@ def corrupt():
 # fab -H deadtree
 # Run this on Debian 8
 def deadtree():
+    """Deadtree is the main services machine. It can be taken down at any time and rebuilt."""
     apt.sudo_ensure() # cuisine.package_ensure is broken otherwise
     
     # Set up /etc/skel
@@ -86,7 +99,6 @@ def deadtree():
     user_ensure('moreorcs')
     group_ensure('moreorcs')
     group_user_ensure('moreorcs', 'moreorcs')
-    nginx.ensure_site('config/nginx/default', cert='config/certs/za3k.com.pem', key='config/keys/blog.za3k.com.key')
     nginx.ensure_site('config/nginx/moreorcs.com', cert='config/certs/moreorcs.com.pem', key='config/keys/moreorcs.com.key')
     put("~/.ssh/id_rsa.pub", "/home/moreorcs/.ssh/authorized_keys", use_sudo=True)
     sudo("chown moreorcs:moreorcs /home/moreorcs/.ssh/authorized_keys")
@@ -106,5 +118,14 @@ def deadtree():
     # twitter archive
     # vlad the remailer [disabled]
     # za3k.com
+    user_ensure('za3k')
+    group_ensure('za3k')
+    group_user_ensure('za3k', 'za3k')
+    nginx.ensure_site('config/nginx/za3k.com', cert='config/certs/za3k.com.pem', key='config/keys/za3k.com.key')
+    put("~/.ssh/id_rsa.pub", "/home/za3k/.ssh/authorized_keys", use_sudo=True)
+    sudo("chown za3k:za3k /home/za3k/.ssh/authorized_keys")
+    with settings(user='za3k'):
+        git.ensure_clone_za3k('za3k', '/var/www/za3k')
+    sudo('chown -R za3k:za3k /var/www/za3k')
     # znc
     nginx.reload()

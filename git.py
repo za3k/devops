@@ -24,7 +24,7 @@ def ensure_clone_github(repository, target, use_https=True):
         remote="git@github.com:{repository}.git".format(repository=repository)
     ensure_clone(remote, target)
 
-def ensure_clone_deadtree(repository, target, use_https=True):
+def ensure_clone_za3k(repository, target, use_https=True):
     if use_https:
         remote="https://git.za3k.com/{repository}.git".format(repository=repository)
     else:
