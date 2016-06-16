@@ -4,8 +4,8 @@ from __future__ import print_function
 
 from fabric.api import run, env, sudo, put, get, cd, settings, hosts
 from fabric.contrib import files
-from cuisine import dir_ensure, dir_exists, group_ensure, group_user_ensure, user_ensure
-import apt, mx, nginx, ssh
+from cuisine import dir_ensure, dir_exists, group_ensure, group_user_ensure, mode_sudo, user_ensure
+import apt, git, mx, nginx, ssh
 
 env.shell = '/bin/sh -c'
 env.use_ssh_config = True
@@ -33,6 +33,10 @@ def corrupt():
 # Run this on Debian 8
 def deadtree():
     apt.sudo_ensure() # cuisine.package_ensure is broken otherwise
+    
+    # Set up /etc/skel
+    sudo("mkdir /etc/skel/.ssh || true")
+    sudo("chmod 700 /etc/skel/.ssh")
 
     # Set up nginx
     already_installed = nginx.ensure()
@@ -79,6 +83,17 @@ def deadtree():
     # logs (nginx) and analysis (analog)
     # mint sync
     # moreorcs.com
+    user_ensure('moreorcs')
+    group_ensure('moreorcs')
+    group_user_ensure('moreorcs', 'moreorcs')
+    nginx.ensure_site('config/nginx/default', cert='config/certs/za3k.com.pem', key='config/keys/blog.za3k.com.key')
+    nginx.ensure_site('config/nginx/moreorcs.com', cert='config/certs/moreorcs.com.pem', key='config/keys/moreorcs.com.key')
+    put("~/.ssh/id_rsa.pub", "/home/moreorcs/.ssh/authorized_keys", use_sudo=True)
+    sudo("chown moreorcs:moreorcs /home/moreorcs/.ssh/authorized_keys")
+    with settings(user='moreorcs'):
+        git.ensure_clone_github('za3k/moreorcs', '/var/www/moreorcs')
+    sudo('chown -R moreorcs:moreorcs /var/www/moreorcs')
+
     # nanowrimo.za3k.com
     # nntp.za3k.com
     # petchat.za3k.com
