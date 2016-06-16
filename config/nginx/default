@@ -7,6 +7,6 @@ server {
     ssl_certificate_key /etc/ssl/private/blog.za3k.com.key;
 
     location / {
-	return 404;
+      return 404;
     }
 }

@@ -3,6 +3,6 @@ server {
     server_name jsfail.com;
 
     location / {
-        root   /usr/share/nginx/jsfail;
+        root   /var/www/jsfail;
     }
 }

@@ -9,4 +9,7 @@ def sudo_ensure():
     """Ensure the 'sudo' command is installed"""
     select_package("apt")
     with mode_user():
-        package_ensure(["sudo"])
+        # The below works but is too slow
+        #run("apt-get update")
+        #run("apt-get install sudo")
+        package_ensure(["sudo"]) # No idea why this didn't work

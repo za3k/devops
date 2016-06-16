@@ -4,11 +4,30 @@ from __future__ import print_function
 
 from fabric.api import run, env, sudo, put, get, cd, settings, hosts
 from fabric.contrib import files
-from cuisine import dir_ensure, group_ensure, group_user_ensure, user_ensure
-import apt, nginx, ssh
+from cuisine import dir_ensure, dir_exists, group_ensure, group_user_ensure, user_ensure
+import apt, mx, nginx, ssh
 
 env.shell = '/bin/sh -c'
 env.use_ssh_config = True
+
+# fab -H corrupt corrupt
+# Run this on Debian 8
+def corrupt():
+    apt.sudo_ensure() # cuisine.package_ensure is broken otherwise
+    with cd("/"): # Hack because /root is -x
+
+        # Set up authorization to back up email to the data server
+        public_key = ssh.ensure_key('/root/.ssh/id_rsa')
+        with settings(user='email', host_string='burn'):
+            files.append('/home/email/.ssh/authorized_keys', public_key)
+
+        # Set up postgres, postfix, dovecot, spamassassin
+        mx.ensure(restore=True)
+
+        # Remind zachary to change their email password
+
+        # Remind zachary to change their DNS records to point to the new MX server
+
 
 # fab -H deadtree
 # Run this on Debian 8
@@ -23,11 +42,11 @@ def deadtree():
     if not already_installed:
         nginx.restart() # IPv[46] listener only changes on restart
 
-    # Set up authorization to pull data from the data server
-    public_key = ssh.ensure_key('/root/.ssh/id_rsa')
-    with settings(user='zachary', host_string='deadtree'):
-        #put(public_key, '/home/zachary/test_authorized_keys')
-        files.append('/home/zachary/test_authorized_keys', public_key)
+    # Set up authorization to back up to the data server
+    #public_key = ssh.ensure_key('/root/.ssh/id_rsa')
+    #with settings(user='deadtree', host_string='burn'):
+    #    #put(public_key, '/home/zachary/test_authorized_keys')
+    #    files.append('/home/deadtree/.ssh/authorized_keys', public_key)
 
     # Load git repos, and if we're not the authority, pull
     # blog.za3k.com
@@ -50,8 +69,8 @@ def deadtree():
     group_ensure('jsfail')
     group_user_ensure('jsfail', 'jsfail')
     nginx.ensure_site('config/nginx/jsfail.com')
-    put('data/jsfail', '/usr/share/nginx', mode='755')
-    sudo('chown -R jsfail:jsfail /usr/share/nginx')
+    put('data/jsfail', '/var/www', mode='755', use_sudo=True)
+    sudo('chown -R jsfail:jsfail /var/www/jsfail')
 
     # justusemake.com
     # library.za3k.com -> website
