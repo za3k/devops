@@ -1,0 +1,8 @@
+server {
+    listen [::]:80;
+    server_name forget.io distributedlibrary.com;
+
+    location / {
+        root   /var/www/forsale;
+    }
+}

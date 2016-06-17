@@ -51,6 +51,12 @@ def deadtree():
     sudo("mkdir /etc/skel/.ssh || true")
     sudo("chmod 700 /etc/skel/.ssh")
 
+    # Add a 'nobody' user
+    user_ensure('nobody')
+    group_ensure('nobody')
+    group_user_ensure('nobody', 'nobody')
+    sudo('usermod -s /bin/false nobody')
+
     # Set up nginx
     already_installed = nginx.ensure()
     nginx.ensure_site('config/nginx/default', cert='config/certs/za3k.com.pem', key='config/keys/blog.za3k.com.key')
@@ -74,6 +80,10 @@ def deadtree():
     #       -> postgres
     # etherpad.za3k.com
     # forsale
+    nginx.ensure_site('config/nginx/forsale')
+    put('data/forsale', '/var/www', mode='755', use_sudo=True)
+    sudo('chown -R nobody:nobody /var/www/forsale')
+
     # gipc daily sync
     # github personal backup
     # github repo list
