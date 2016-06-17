@@ -121,6 +121,10 @@ def deadtree():
     sudo('chown -R moreorcs:moreorcs /var/www/moreorcs')
 
     # nanowrimo.za3k.com
+    nginx.ensure_site('config/nginx/nanowrimo.za3k.com', cert='config/certs/nanowrimo.za3k.com.pem', key='config/keys/nanowrimo.za3k.com.key')
+    put('data/nanowrimo', '/var/www', mode='755', use_sudo=True)
+    sudo('chown -R nobody:nobody /var/www/nanowrimo')
+
     # nntp.za3k.com
     # petchat.za3k.com
     # publishing.za3k.com
