@@ -127,6 +127,10 @@ def deadtree():
 
     # nntp.za3k.com
     # petchat.za3k.com
+    nginx.ensure_site('config/nginx/petchat.za3k.com')
+    git.ensure_clone_za3k('petchat', '/var/www/petchat')
+    sudo('chown -R nobody:nobody /var/www/petchat')
+
     # publishing.za3k.com
     # redis.za3k.com -> redis [disabled]
     #                -> webdis
