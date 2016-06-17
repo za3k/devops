@@ -100,6 +100,10 @@ def deadtree():
     sudo('chown -R jsfail:jsfail /var/www/jsfail')
 
     # justusemake.com
+    nginx.ensure_site('config/nginx/justusemake.com', cert='config/certs/justusemake.com.pem', key='config/keys/justusemake.com.key')
+    put('data/justusemake', '/var/www', mode='755', use_sudo=True)
+    sudo('chown -R nobody:nobody /var/www/justusemake')
+
     # library.za3k.com -> website
     #                  -> sync script
     #                  -> card catalog
