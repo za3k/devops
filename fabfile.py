@@ -5,6 +5,7 @@ from __future__ import print_function
 from fabric.api import run, env, sudo, put, get, cd, settings, hosts
 from fabric.contrib import files
 from cuisine import dir_ensure, dir_exists, group_ensure, group_user_ensure, mode_sudo, user_ensure
+from StringIO import StringIO
 import apt, git, mx, nginx, ssh
 
 env.shell = '/bin/sh -c'
@@ -25,6 +26,8 @@ def burn():
         git.za3k.com: HTTPS access for cloning
         burn.za3k.com: SCP access for backups and git commits
     """
+    # Daily
+    #    * rsync -rltp "$@" --delete --chmod=D755,F644 /data/archive/tarragon.latest/home/zachary/books/ /data/books
     pass
 
 # fab -H corrupt corrupt
@@ -116,6 +119,16 @@ def deadtree():
     # library.za3k.com -> website
     #                  -> sync script
     #                  -> card catalog
+    user_ensure('library')
+    group_ensure('library')
+    group_user_ensure('library', 'library')
+    with mode_sudo():
+        dir_ensure('/var/www/library', mode='755')
+    sudo("chown library:library /var/www/library")
+    sudo("rsync -av burn.za3k.com::library --delete /var/www/library", user='library')
+    put(StringIO("rsync -a burn.za3k.com::library --delete /var/www/library"), "/etc/cron.daily/library.sync", mode='755', use_sudo=True)
+    nginx.ensure_site('config/nginx/library.za3k.com', cert='config/certs/library.za3k.com.pem', key='config/keys/library.za3k.com.key')
+
     # logs (nginx) and analysis (analog)
     # mint sync
     # moreorcs.com
