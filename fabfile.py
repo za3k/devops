@@ -12,6 +12,11 @@ env.use_ssh_config = True
 
 def avalanche():
     """Avalanche doesn't really run anything except the printserver, it's a point of presence."""
+
+    # Set up the firewall
+    put("config/firewalls/avalanche.sh", "/usr/local/bin", use_sudo=True)
+    sudo("sh /usr/local/bin/avalanche.sh")
+
     pass
 
 def burn():
@@ -56,6 +61,10 @@ def deadtree():
     group_ensure('nobody')
     group_user_ensure('nobody', 'nobody')
     sudo('usermod -s /bin/false nobody')
+
+    # Set up the firewall
+    put("config/firewalls/deadtree.sh", "/usr/local/bin", use_sudo=True)
+    sudo("sh /usr/local/bin/deadtree.sh")
 
     # Set up nginx
     already_installed = nginx.ensure()
