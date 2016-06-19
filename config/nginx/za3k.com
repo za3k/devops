@@ -23,10 +23,6 @@ server {
     index index.html index.md;
     root /var/www/za3k;
 
-    location /archlinux-raspberrypi-1G.img {
-        alias /var/www/archlinux-raspberrypi-1G.img;
-    }
-
     #location /github {
     #    alias /var/www/github;
     #    gzip on;
