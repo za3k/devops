@@ -39,9 +39,10 @@ server {
     # See https://www.digitalocean.com/community/tutorials/understanding-and-implementing-fastcgi-proxying-in-nginx
     # This is clobbering all previous settings -- nothing can be inherited.
     # Do not add any fastcgi_param line inside the location blocks for this reason
-    include fastcgi_params;
+    include /etc/nginx/fastcgi_params;
     fastcgi_param PATH_TRANSLATED $document_root$fastcgi_script_name;
     fastcgi_param SCRIPT_FILENAME $document_root$processor;
+
     #fastcgi_param REQUEST_METHOD $request_method;
     location ~ \.md$ {
         set $processor /cgi-bin/markdown/Markdown.cgi;

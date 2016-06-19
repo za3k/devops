@@ -5,3 +5,4 @@
 - Enable .view files on za3k.com
 - Enable .md files on za3k.com
 - Enable automatic za3k.com repo sync (push to deploy)
+- Enable automatic za3k.com github repo sync

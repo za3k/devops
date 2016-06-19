@@ -6,7 +6,7 @@ from fabric.api import run, env, sudo, put, get, cd, settings, hosts
 from fabric.contrib import files
 from cuisine import dir_ensure, dir_exists, group_ensure, group_user_ensure, mode_sudo, user_ensure
 from StringIO import StringIO
-import apt, git, mx, nginx, ssh
+import apt, git, mx, nginx, ruby, ssh
 
 env.shell = '/bin/sh -c'
 env.use_ssh_config = True
@@ -72,7 +72,7 @@ def deadtree():
     # Set up nginx
     already_installed = nginx.ensure()
     nginx.ensure_site('config/nginx/default', cert='config/certs/za3k.com.pem', key='config/keys/blog.za3k.com.key')
-    #nginx.ensure_fastcgi()
+    nginx.ensure_fcgiwrap(children=4)
     #nginx.ensure_php5 cgi
     if not already_installed:
         nginx.restart() # IPv[46] listener only changes on restart
@@ -176,5 +176,9 @@ def deadtree():
     with settings(user='za3k'):
         git.ensure_clone_za3k('za3k', '/var/www/za3k')
     sudo('chown -R za3k:za3k /var/www/za3k')
+    # Markdown .md
+    ruby.ensure()
+    ruby.ensure_gems(["redcarpet"])
+
     # znc
     nginx.reload()

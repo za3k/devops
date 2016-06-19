@@ -40,3 +40,9 @@ def ensure_site(config_file, cert=None, key=None, enabled=True):
         crypto.put_key(key)
     if enabled:
         sudo("ln -s -f {config} /etc/nginx/sites-enabled".format(config=placed_config))
+
+def ensure_fcgiwrap(children=4):
+    select_package("apt")
+    already_installed = package_ensure(["fcgiwrap"]) # On debian will automatically be enabled
+    sudo('echo "FCGI_CHILDREN={}" > /etc/default/fcgiwrap'.format(children))
+    sudo('/etc/init.d/fcgiwrap restart')
