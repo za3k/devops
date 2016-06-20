@@ -1,4 +1,4 @@
-# Only listen on HTTPS, permanently redirect HTTP requests
+# Only listen on HTTPS
 server {
     listen [::]:80;
     server_name    thinkingtropes.com;
