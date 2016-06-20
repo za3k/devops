@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 from fabric.api import run, env, sudo, put, get, cd, settings, hosts
-from cuisine import dir_ensure, mode_sudo, select_package, package_ensure
+from cuisine import dir_ensure, group_ensure, group_user_ensure, mode_sudo, select_package, package_ensure, user_ensure
 import crypto
 
 def ensure():
@@ -43,6 +43,11 @@ def ensure_site(config_file, cert=None, key=None, enabled=True):
 
 def ensure_fcgiwrap(children=4):
     select_package("apt")
-    already_installed = package_ensure(["fcgiwrap"]) # On debian will automatically be enabled
+    package_ensure(["fcgiwrap"]) # On debian will automatically be enabled
+    # fcgi can't run status script because its default user (www-data) has no login shell--not sure why exactly but work around it by making a new user
+    user_ensure('fcgiwrap')
+    group_ensure('fcgiwrap')
+    group_user_ensure('fcgiwrap', 'fcgiwrap')
+    sudo('sed -i "s/www-data/fcgiwrap/" /lib/systemd/system/fcgiwrap.service')
     sudo('echo "FCGI_CHILDREN={}" > /etc/default/fcgiwrap'.format(children))
     sudo('/etc/init.d/fcgiwrap restart')

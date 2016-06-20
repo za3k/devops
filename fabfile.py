@@ -4,7 +4,7 @@ from __future__ import print_function
 
 from fabric.api import run, env, sudo, put, get, cd, settings, hosts
 from fabric.contrib import files
-from cuisine import dir_ensure, dir_exists, group_ensure, group_user_ensure, mode_sudo, user_ensure
+from cuisine import dir_ensure, dir_exists, group_ensure, group_user_ensure, mode_sudo, package_ensure, user_ensure
 from StringIO import StringIO
 import apt, git, mx, nginx, ruby, ssh
 
@@ -179,6 +179,8 @@ def deadtree():
     # Markdown .md
     ruby.ensure()
     ruby.ensure_gems(["redcarpet"])
+    # Status page
+    package_ensure(["parallel"])
 
     # znc
     nginx.reload()
