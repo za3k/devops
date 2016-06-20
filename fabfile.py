@@ -180,7 +180,7 @@ def deadtree():
     ruby.ensure()
     ruby.ensure_gems(["redcarpet"])
     # Status page
-    package_ensure(["parallel"])
+    package_ensure(["parallel", "curl"])
 
     # znc
     nginx.reload()

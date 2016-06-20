@@ -50,4 +50,5 @@ def ensure_fcgiwrap(children=4):
     group_user_ensure('fcgiwrap', 'fcgiwrap')
     sudo('sed -i "s/www-data/fcgiwrap/" /lib/systemd/system/fcgiwrap.service')
     sudo('echo "FCGI_CHILDREN={}" > /etc/default/fcgiwrap'.format(children))
+    sudo('systemctl daemon-reload')
     sudo('/etc/init.d/fcgiwrap restart')
