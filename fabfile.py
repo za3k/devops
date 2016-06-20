@@ -125,8 +125,8 @@ def deadtree():
     with mode_sudo():
         dir_ensure('/var/www/library', mode='755')
     sudo("chown library:library /var/www/library")
-    sudo("rsync -av burn.za3k.com::library --delete /var/www/library", user='library')
-    put(StringIO("rsync -a burn.za3k.com::library --delete /var/www/library"), "/etc/cron.daily/library.sync", mode='755', use_sudo=True)
+    put("config/library/library.sync", "/etc/cron.daily", mode='755', use_sudo=True)
+    sudo("/etc/cron.daily/library.sync")
     nginx.ensure_site('config/nginx/library.za3k.com', cert='config/certs/library.za3k.com.pem', key='config/keys/library.za3k.com.key')
 
     # logs (nginx) and analysis (analog)
