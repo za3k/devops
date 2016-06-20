@@ -10,4 +10,4 @@ def ensure():
 
 def ensure_gems(gems):
     for gem in gems:
-        sudo("gem install {}".format(gem))
+        sudo("gem install {} --conservative".format(gem))
