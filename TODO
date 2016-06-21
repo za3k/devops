@@ -6,3 +6,5 @@
 - Enable .md files on za3k.com
 - Enable automatic za3k.com repo sync (push to deploy)
 - Enable automatic za3k.com github repo sync
+- Add automatic MySQL backup/restore
+- Add automatic postgres backup/restore

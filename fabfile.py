@@ -83,8 +83,23 @@ def deadtree():
     #    #put(public_key, '/home/zachary/test_authorized_keys')
     #    files.append('/home/deadtree/.ssh/authorized_keys', public_key)
 
-    # Load git repos, and if we're not the authority, pull
     # blog.za3k.com
+    package_ensure(["php5-fpm", "mysql-server", "php5-mysql"])
+
+    user_ensure('blog')
+    group_ensure('blog')
+    group_user_ensure('blog', 'blog')
+    put("~/.ssh/id_rsa.pub", "/home/blog/.ssh/authorized_keys", use_sudo=True)
+    sudo("chown blog:blog /home/blog/.ssh/authorized_keys")
+
+    nginx.ensure_site('config/nginx/blog.za3k.com', cert='config/certs/blog.za3k.com.pem', key='config/keys/blog.za3k.com.key')
+    with settings(user='blog'):
+        git.ensure_clone_za3k('za3k_blog', '/var/www/za3k_blog')
+    # Replace a database-specific password or make it more obvious it's not used? Currently we're using user ACLs and this gets ignored anyway
+    sudo('chown -R za3k:za3k /var/www/za3k')
+    # Load the blog database from backup at /srv/mysql -> /var/lib/mysql [MANUAL]
+    sudo('systemctl restart mysql')
+
     # colony on the moon
     # email -> imap (dovecot)
     #       -> smtp (postfix)
