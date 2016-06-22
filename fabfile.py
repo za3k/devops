@@ -6,7 +6,7 @@ from fabric.api import run, env, sudo, put, get, cd, settings, hosts
 from fabric.contrib import files
 from cuisine import dir_ensure, dir_exists, group_ensure, group_user_ensure, mode_sudo, package_ensure, user_ensure
 from StringIO import StringIO
-import apt, git, mx, nginx, ruby, ssh
+import apt, git, mx, nginx, ruby, ssh, util
 
 env.shell = '/bin/sh -c'
 env.use_ssh_config = True
@@ -73,7 +73,6 @@ def deadtree():
     already_installed = nginx.ensure()
     nginx.ensure_site('config/nginx/default', cert='config/certs/za3k.com.pem', key='config/keys/blog.za3k.com.key')
     nginx.ensure_fcgiwrap(children=4)
-    #nginx.ensure_php5 cgi
     if not already_installed:
         nginx.restart() # IPv[46] listener only changes on restart
 
@@ -115,8 +114,7 @@ def deadtree():
     group_ensure('jsfail')
     group_user_ensure('jsfail', 'jsfail')
     nginx.ensure_site('config/nginx/jsfail.com')
-    put('data/jsfail', '/var/www', mode='755', use_sudo=True)
-    sudo('chown -R jsfail:jsfail /var/www/jsfail')
+    util.put('data/jsfail', '/var/www', 'jsfail', mode='755')
 
     # justusemake.com
     nginx.ensure_site('config/nginx/justusemake.com', cert='config/certs/justusemake.com.pem', key='config/keys/justusemake.com.key')
@@ -143,23 +141,17 @@ def deadtree():
     group_ensure('moreorcs')
     group_user_ensure('moreorcs', 'moreorcs')
     nginx.ensure_site('config/nginx/moreorcs.com', cert='config/certs/moreorcs.com.pem', key='config/keys/moreorcs.com.key')
-    put("~/.ssh/id_rsa.pub", "/home/moreorcs/.ssh/authorized_keys", use_sudo=True)
-    sudo("chown moreorcs:moreorcs /home/moreorcs/.ssh/authorized_keys")
-    with settings(user='moreorcs'):
-        git.ensure_clone_github('za3k/moreorcs', '/var/www/moreorcs')
-    sudo('chown -R moreorcs:moreorcs /var/www/moreorcs')
+    git.ensure_clone_github('za3k/moreorcs', '/var/www/moreorcs', user='moreorcs')
 
     # nanowrimo.za3k.com
     nginx.ensure_site('config/nginx/nanowrimo.za3k.com', cert='config/certs/nanowrimo.za3k.com.pem', key='config/keys/nanowrimo.za3k.com.key')
-    put('data/nanowrimo', '/var/www', mode='755', use_sudo=True)
-    sudo('chown -R nobody:nobody /var/www/nanowrimo')
+    util.put('data/nanowrimo', '/var/www', user='nobody', mode='755')
 
     # nntp.za3k.com
     # petchat.za3k.com
     nginx.ensure_site('config/nginx/petchat.za3k.com')
-    if not files.exists('/var/www/petchat/'):
-        git.ensure_clone_za3k('petchat', '/var/www/petchat')
-        sudo('chown -R nobody:nobody /var/www/petchat')
+    if not files.exists('/var/www/petchat'):
+        git.ensure_clone_za3k('petchat', '/var/www/petchat', user='nobody')
 
     # publishing.za3k.com
     # redis.za3k.com -> redis [disabled]
@@ -167,8 +159,7 @@ def deadtree():
     # status.za3k.com
     # thinkingtropes.com
     nginx.ensure_site('config/nginx/thinkingtropes.com')
-    put('data/thinkingtropes', '/var/www', mode='755', use_sudo=True)
-    sudo('chown -R nobody:nobody /var/www/thinkingtropes')
+    util.put('data/thinkingtropes', '/var/www', user='nobody', mode='755')
 
     # thisisashell.com [disabled]
     # twitter archive
@@ -178,11 +169,7 @@ def deadtree():
     group_ensure('za3k')
     group_user_ensure('za3k', 'za3k')
     nginx.ensure_site('config/nginx/za3k.com', cert='config/certs/za3k.com.pem', key='config/keys/za3k.com.key')
-    put("~/.ssh/id_rsa.pub", "/home/za3k/.ssh/authorized_keys", use_sudo=True)
-    sudo("chown za3k:za3k /home/za3k/.ssh/authorized_keys")
-    with settings(user='za3k'):
-        git.ensure_clone_za3k('za3k', '/var/www/za3k')
-    sudo('chown -R za3k:za3k /var/www/za3k')
+    git.ensure_clone_za3k('za3k', '/var/www/za3k', user='za3k')
     # Markdown .md
     ruby.ensure()
     ruby.ensure_gems(["redcarpet"])
