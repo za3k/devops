@@ -1,7 +1,6 @@
 - Add a certificate for thinkingtropes.com
 - Re-enable library card catalog
 - Add github archiving section
-- Enable status.za3k.com
 - Enable .view files on za3k.com
 - Enable .md files on za3k.com
 - Enable automatic za3k.com repo sync (push to deploy)

@@ -53,6 +53,7 @@ def corrupt():
     #       -> smtp (postfix)
     #       -> spamassassin
     #       -> postgres
+    # znc
 
 
 # fab -H deadtree
@@ -100,8 +101,7 @@ def deadtree():
     # etherpad.za3k.com
     # forsale
     nginx.ensure_site('config/nginx/forsale')
-    put('data/forsale', '/var/www', mode='755', use_sudo=True)
-    sudo('chown -R nobody:nobody /var/www/forsale')
+    util.put('data/forsale', '/var/www', user='nobody', mode='755')
 
     # gipc daily sync
     # github personal backup
@@ -118,8 +118,7 @@ def deadtree():
 
     # justusemake.com
     nginx.ensure_site('config/nginx/justusemake.com', cert='config/certs/justusemake.com.pem', key='config/keys/justusemake.com.key')
-    put('data/justusemake', '/var/www', mode='755', use_sudo=True)
-    sudo('chown -R nobody:nobody /var/www/justusemake')
+    util.put('data/justusemake', '/var/www', 'nobody', mode='755')
 
     # library.za3k.com -> website
     #                  -> sync script
@@ -154,18 +153,13 @@ def deadtree():
         git.ensure_clone_za3k('petchat', '/var/www/petchat', user='nobody')
 
     # publishing.za3k.com
-    # redis.za3k.com -> redis [disabled]
-    #                -> webdis
     # thinkingtropes.com
     nginx.ensure_site('config/nginx/thinkingtropes.com')
     util.put('data/thinkingtropes', '/var/www', user='nobody', mode='755')
 
     # thisisashell.com [disabled]
     # twitter archive
-    # vlad the remailer [disabled]
-
     # za3k.com
-    # status.za3k.com
     user_ensure('za3k')
     group_ensure('za3k')
     group_user_ensure('za3k', 'za3k')
@@ -176,9 +170,7 @@ def deadtree():
     ruby.ensure_gems(["redcarpet"])
     # colony on the moon
     sudo("rsync -av burn.za3k.com::colony --delete /var/www/colony", user='nobody')
-    
-    # status.
+    # |-- status.za3k.com
     package_ensure(["parallel", "curl"])
 
-    # znc
     nginx.reload()
