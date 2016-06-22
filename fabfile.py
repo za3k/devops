@@ -28,6 +28,7 @@ def burn():
     """
     # Daily
     #    * rsync -rltp "$@" --delete --chmod=D755,F644 /data/archive/tarragon.latest/home/zachary/books/ /data/books
+    # gmail backup
     pass
 
 # fab -H corrupt corrupt
@@ -47,6 +48,11 @@ def corrupt():
         # Remind zachary to change their email password
 
         # Remind zachary to change their DNS records to point to the new MX server
+
+    # email -> imap (dovecot)
+    #       -> smtp (postfix)
+    #       -> spamassassin
+    #       -> postgres
 
 
 # fab -H deadtree
@@ -91,11 +97,6 @@ def deadtree():
     # Load the blog database from backup at /srv/mysql -> /var/lib/mysql [MANUAL]
     sudo('systemctl restart mysql')
 
-    # colony on the moon
-    # email -> imap (dovecot)
-    #       -> smtp (postfix)
-    #       -> spamassassin
-    #       -> postgres
     # etherpad.za3k.com
     # forsale
     nginx.ensure_site('config/nginx/forsale')
@@ -106,7 +107,6 @@ def deadtree():
     # github personal backup
     # github repo list
     #                  -> updater
-    # gmail backup
     # irc.za3k.com -> irc
     #              -> webchat (qwebirc)
     # jsfail.com
@@ -156,7 +156,6 @@ def deadtree():
     # publishing.za3k.com
     # redis.za3k.com -> redis [disabled]
     #                -> webdis
-    # status.za3k.com
     # thinkingtropes.com
     nginx.ensure_site('config/nginx/thinkingtropes.com')
     util.put('data/thinkingtropes', '/var/www', user='nobody', mode='755')
@@ -164,7 +163,9 @@ def deadtree():
     # thisisashell.com [disabled]
     # twitter archive
     # vlad the remailer [disabled]
+
     # za3k.com
+    # status.za3k.com
     user_ensure('za3k')
     group_ensure('za3k')
     group_user_ensure('za3k', 'za3k')
@@ -173,7 +174,10 @@ def deadtree():
     # Markdown .md
     ruby.ensure()
     ruby.ensure_gems(["redcarpet"])
-    # Status page
+    # colony on the moon
+    sudo("rsync -av burn.za3k.com::colony --delete /var/www/colony", user='nobody')
+    
+    # status.
     package_ensure(["parallel", "curl"])
 
     # znc

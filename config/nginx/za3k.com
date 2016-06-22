@@ -28,6 +28,10 @@ server {
     #    gzip on;
     #    gunzip on; # Enables use of .gz files in directory
     #}
+    location /~colony {
+        alias /var/www/colony;
+        autoindex on;
+    }
     location /~logs {
         alias /var/www/logs;
         autoindex on;
