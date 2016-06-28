@@ -6,7 +6,7 @@ from fabric.api import run, env, sudo, put, get, cd, settings, hosts
 from fabric.contrib import files
 from cuisine import dir_ensure, dir_exists, group_ensure, group_user_ensure, mode_sudo, package_ensure, user_ensure
 from StringIO import StringIO
-import apt, git, mx, nginx, ruby, ssh, util
+import apt, git, mx, nginx, node, ruby, ssh, supervisord, util
 
 env.shell = '/bin/sh -c'
 env.use_ssh_config = True
@@ -89,16 +89,51 @@ def deadtree():
     #    #put(public_key, '/home/zachary/test_authorized_keys')
     #    files.append('/home/deadtree/.ssh/authorized_keys', public_key)
 
+    # ddns.za3k.com (TCP port 80, web updater for DDNS)
+    # ns.za3k.com (UDP port 53, DNS server)
+    user_ensure('nsd')
+    group_ensure('nsd')
+    group_user_ensure('nsd', 'nsd')
+    with mode_sudo():
+        dir_ensure('/var/lib/nsd', mode='755')
+    sudo("chown nsd:nsd /var/lib/nsd")
+    package_ensure(["nsd"])
+    with cd("/var/lib/nsd"):
+        sudo("touch /var/lib/nsd/moreorcs.com.zone && chown nsd:nsd /var/lib/nsd/moreorcs.com.zone")
+    node.ensure()
+    put("config/ddns/moreorcs.com.zonetemplate", "/etc/nsd", mode='640', use_sudo=True)
+    supervisord.ensure()
+    git.ensure_clone_github('thingless/ddns', '/var/lib/nsd/ddns', user='nsd')
+    supervisord.ensure_config("config/supervisor/ddns.conf")
+    put("config/ddns/config.json", "/var/lib/nsd", mode='644', use_sudo=True)
+    sudo("chown nsd:nsd /var/lib/nsd/config.json")
+    # [Manual] Copy dnsDB.json from backup
+    sudo("cd /var/lib/nsd && ln -sf ddns/index.txt index.txt && chown nsd:nsd index.txt")
+    supervisord.update() # Run ddns
+    package_ensure(["nsd"])
+    put("config/ddns/nsd.conf", "/etc/nsd", mode='644', use_sudo=True)
+    sudo("systemctl restart nsd")
+    nginx.ensure_site('config/nginx/ddns.za3k.com', cert='config/certs/ddns.za3k.com.pem', key='config/keys/ddns.za3k.com.key')
+    nginx.reload()
+
     # blog.za3k.com
     package_ensure(["php5-fpm", "mysql-server", "php5-mysql"])
 
     nginx.ensure_site('config/nginx/blog.za3k.com', cert='config/certs/blog.za3k.com.pem', key='config/keys/blog.za3k.com.key')
     git.ensure_clone_za3k('za3k_blog', '/var/www/za3k_blog', user='fcgiwrap')
-    # Replace a database-specific password or make it more obvious it's not used? Currently we're using user ACLs and this gets ignored anyway
-    # Load the blog database from backup at /srv/mysql -> /var/lib/mysql [MANUAL]
+    # TODO: Replace a database-specific password or make it more obvious it's not used? Currently we're using user ACLs and this gets ignored anyway, I think?
+    # [Manual] Load the blog database from backup at /srv/mysql -> /var/lib/mysql
     sudo('systemctl restart mysql')
 
     # etherpad.za3k.com
+    #user_ensure('etherpad')
+    #group_ensure('etherpad')
+    #group_user_ensure('etherpad', 'etherpad')
+    #nginx.ensure_site('config/nginx/etherpad.za3k.com', cert='config/certs/etherpad.za3k.com.pem', key='config/keys/etherpad.za3k.com.key')
+    #put("config/etherpad/APIKEY.txt", "/var/www/etherpad")
+    #put("config/etherpad/settings.json", "/var/www/etherpad")
+    #sudo("rsync -av burn.za3k.com::etherpad --delete /var/www/etherpad", user='etherpad')
+
     # forsale
     nginx.ensure_site('config/nginx/forsale')
     util.put('data/forsale', '/var/www', user='nobody', mode='755')
@@ -157,7 +192,6 @@ def deadtree():
     nginx.ensure_site('config/nginx/thinkingtropes.com')
     util.put('data/thinkingtropes', '/var/www', user='nobody', mode='755')
 
-    # thisisashell.com [disabled]
     # twitter archive
     # za3k.com
     user_ensure('za3k')

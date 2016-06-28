@@ -1,0 +1,29 @@
+$ORIGIN moreorcs.com.
+$TTL 1800
+@       IN      SOA     ns.za3k.com. za3k.za3k.com. (
+                        __SERIAL_NUMBER__       ; serial number
+                        3600                    ; refresh
+                        900                     ; retry
+                        1209600                 ; expire
+                        1800                    ; ttl
+                        )
+; Name servers
+                    IN      NS      ns.za3k.com.
+                    IN      NS      ns6.gandi.net.
+
+; A records
+@               600 IN      A       71.19.156.60
+@               600 IN      AAAA    2605:2700:0:5::4713:9c3c
+
+; Avoid any abuse from dynamic DNS
+www                 IN      CNAME   @
+ns                  IN      CNAME   @
+
+; Authenticate that keybase.io/za3k owns this domain
+_keybase      10800 IN      TXT     "keybase-site-verification=okgAIwo26szPxyLWAz0ILh8iMUO6jEQem_0KQDoTNbM"
+
+; MX record points to mailinator, a free mail service
+@             10800 IN      MX 50   mail.mailinator.com.
+
+; Dynamic DNS records
+__DYNAMIC_DNS_RECORDS__

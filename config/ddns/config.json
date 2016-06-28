@@ -1,0 +1,7 @@
+{
+    "zone_output_path": "/etc/nsd/moreorcs.com.zone",
+    "zone_template_path": "/etc/nsd/moreorcs.com.zonetemplate",
+    "port": 9090,
+    "api_anonymous_allowed": true,
+    "param_blacklist": ["type", "ip", "ttl"]
+}

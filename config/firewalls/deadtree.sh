@@ -56,6 +56,8 @@ ipt -A TCP    -p TCP --dport 22 -j ACCEPT
 # Allow HTTP and HTTPS
 ipt -A TCP    -p TCP --dport 80 -j ACCEPT
 ipt -A TCP    -p TCP --dport 443 -j ACCEPT
+# Allow DNS
+ipt -A UDP    -p UDP --dport 53 -j ACCEPT
 
 mkdir -p /etc/iptables
 iptables-save >/etc/iptables/iptables.rules
