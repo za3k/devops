@@ -1,0 +1,6 @@
+# hosts = localhost
+user = postfix
+password = POSTFIX_DATABASE_PASSWORD
+dbname = email
+
+query = SELECT email FROM aliases WHERE alias='%s'

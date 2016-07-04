@@ -37,6 +37,7 @@ def corrupt():
     apt.sudo_ensure() # cuisine.package_ensure is broken otherwise
     with cd("/"): # Hack because /root is -x
 
+        # Set up the firewall
         # Set up authorization to back up email to the data server
         public_key = ssh.ensure_key('/root/.ssh/id_rsa')
         with settings(user='email', host_string='burn'):
@@ -48,12 +49,9 @@ def corrupt():
         # Remind zachary to change their email password
 
         # Remind zachary to change their DNS records to point to the new MX server
+        # Remind zachary to change their rDNS record to point to za3k.com
 
-    # email -> imap (dovecot)
-    #       -> smtp (postfix)
-    #       -> spamassassin
-    #       -> postgres
-    # znc
+        # znc.za3k.com
 
 
 # fab -H deadtree

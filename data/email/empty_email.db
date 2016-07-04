@@ -1,0 +1,138 @@
+CREATE DATABASE email WITH TEMPLATE = template0 OWNER = postgres;
+REVOKE ALL ON DATABASE email FROM PUBLIC;
+REVOKE ALL ON DATABASE email FROM postgres;
+GRANT ALL ON DATABASE email TO postgres;
+GRANT ALL ON DATABASE email TO postfix;
+GRANT ALL ON DATABASE email TO dovecot;
+
+\connect email;
+
+--
+-- PostgreSQL database dump
+--
+
+SET statement_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+SET search_path = public, pg_catalog;
+
+DROP TABLE public.users;
+DROP TABLE public.aliases;
+DROP EXTENSION plpgsql;
+DROP SCHEMA public;
+--
+-- Name: public; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA public;
+
+
+ALTER SCHEMA public OWNER TO postgres;
+
+--
+-- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: postgres
+--
+
+COMMENT ON SCHEMA public IS 'standard public schema';
+
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+SET search_path = public, pg_catalog;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: aliases; Type: TABLE; Schema: public; Owner: postfix; Tablespace: 
+--
+
+CREATE TABLE aliases (
+    alias text NOT NULL,
+    email text NOT NULL
+);
+
+
+ALTER TABLE public.aliases OWNER TO postfix;
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE users (
+    username text NOT NULL,
+    domain text NOT NULL,
+    created timestamp with time zone DEFAULT now(),
+    password text NOT NULL
+);
+
+
+ALTER TABLE public.users OWNER TO postgres;
+
+--
+-- Data for Name: aliases; Type: TABLE DATA; Schema: public; Owner: postfix
+--
+
+COPY aliases (alias, email) FROM stdin;
+\.
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY users (username, domain, created, password) FROM stdin;
+\.
+
+
+--
+-- Name: public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
+-- Name: aliases; Type: ACL; Schema: public; Owner: postfix
+--
+
+REVOKE ALL ON TABLE aliases FROM PUBLIC;
+REVOKE ALL ON TABLE aliases FROM postfix;
+GRANT ALL ON TABLE aliases TO postfix;
+GRANT ALL ON TABLE aliases TO dovecot;
+
+
+--
+-- Name: users; Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON TABLE users FROM PUBLIC;
+REVOKE ALL ON TABLE users FROM postgres;
+GRANT ALL ON TABLE users TO postgres;
+GRANT ALL ON TABLE users TO dovecot;
+GRANT ALL ON TABLE users TO postfix;
+
+
+--
+-- PostgreSQL database dump complete
+--
+

@@ -1,0 +1,6 @@
+# hosts = localhost
+user = postfix
+password = POSTFIX_DATABASE_PASSWORD
+dbname = email
+
+query = SELECT concat(username,'@',domain,'/') as email FROM users WHERE username='%s'

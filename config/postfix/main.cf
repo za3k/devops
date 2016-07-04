@@ -1,0 +1,65 @@
+# See /usr/share/postfix/main.cf.dist for a commented, more complete version
+
+
+# Debian specific:  Specifying a file name will cause the first
+# line of that file to be used as the name.  The Debian default
+# is /etc/mailname.
+#myorigin = /etc/mailname
+
+smtpd_banner = $myhostname ESMTP $mail_name (Debian/GNU)
+biff = no
+
+# appending .domain is the MUA's job.
+append_dot_mydomain = no
+
+# Uncomment the next line to generate "delayed mail" warnings
+#delay_warning_time = 4h
+
+readme_directory = no
+
+# TLS parameters
+smtpd_tls_cert_file=/etc/ssl/certs/smtp.za3k.com.pem
+smtpd_tls_key_file=/etc/ssl/private/smtp.za3k.com.key
+smtpd_use_tls=yes
+smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
+smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
+smtpd_tls_dh1024_param_file = /etc/ssl/dhparams-postfix.pem
+smtpd_tls_mandatory_protocols=!SSLv2,!SSLv3
+smtp_tls_mandatory_protocols=!SSLv2,!SSLv3
+smtpd_tls_protocols=!SSLv2,!SSLv3
+smtp_tls_protocols=!SSLv2,!SSLv3
+smtpd_tls_exclude_ciphers = aNULL, eNULL, EXPORT, DES, RC4, MD5, PSK, aECDH, EDH-DSS-DES-CBC3-SHA, EDH-RSA-DES-CDC3-SHA, KRB5-DE5, CBC3-SHA
+
+smtpd_sasl_type = dovecot
+smtpd_sasl_path = private/auth
+
+smtpd_helo_required = yes
+# Don't talk to mail systems that don't know their own hostname.
+smtpd_helo_restrictions = reject_unknown_helo_hostname
+# Don't accept mail from domains that don't exist.
+smtpd_sender_restrictions = reject_unknown_sender_domain
+
+myhostname = za3k.com
+myorigin = /etc/mailname
+mydestination = za3k.com, smtp.za3k.com, localhost.com, localhost
+relayhost = 
+#mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+mynetworks_style = host
+mailbox_size_limit = 0
+recipient_delimiter = +
+inet_interfaces = all
+
+smtpd_relay_restrictions = permit_mynetworks,
+  permit_sasl_authenticated,
+  reject_unauth_destination
+
+alias_maps = hash:/etc/aliases
+virtual_alias_maps = pgsql:/etc/postfix/pgsql-virtual-aliases.cf
+local_recipient_maps = pgsql:/etc/postfix/pgsql-virtual-mailbox.cf $alias_maps
+mailbox_transport = lmtp:unix:private/dovecot-lmtp
+
+# DKIM
+milter_default_action = accept
+milter_protocol = 6
+smtpd_milters = inet:localhost:12345
+non_smtpd_milters = inet:localhost:12345
