@@ -36,8 +36,10 @@ def burn():
 def corrupt():
     apt.sudo_ensure() # cuisine.package_ensure is broken otherwise
     with cd("/"): # Hack because /root is -x
-
         # Set up the firewall
+        put("config/firewalls/corrupt.sh", "/usr/local/bin")
+        run("sh /usr/local/bin/corrupt.sh")
+
         # Set up authorization to back up email to the data server
         public_key = ssh.ensure_key('/root/.ssh/id_rsa')
         with settings(user='email', host_string='burn'):
