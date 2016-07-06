@@ -126,13 +126,22 @@ def deadtree():
     sudo('systemctl restart mysql')
 
     # etherpad.za3k.com
-    #user_ensure('etherpad')
-    #group_ensure('etherpad')
-    #group_user_ensure('etherpad', 'etherpad')
-    #nginx.ensure_site('config/nginx/etherpad.za3k.com', cert='config/certs/etherpad.za3k.com.pem', key='config/keys/etherpad.za3k.com.key')
-    #put("config/etherpad/APIKEY.txt", "/var/www/etherpad")
-    #put("config/etherpad/settings.json", "/var/www/etherpad")
-    #sudo("rsync -av burn.za3k.com::etherpad --delete /var/www/etherpad", user='etherpad')
+    package_ensure(["sqlite3"])
+    user_ensure('etherpad')
+    group_ensure('etherpad')
+    group_user_ensure('etherpad', 'etherpad')
+    git.ensure_clone_github('ether/etherpad-lite', '/var/www/etherpad', commit='1.6.0', user='etherpad')
+    nginx.ensure_site('config/nginx/etherpad.za3k.com', cert='config/certs/etherpad.za3k.com.pem', key='config/keys/etherpad.za3k.com.key')
+    util.put("config/etherpad/APIKEY.txt", "/var/www/etherpad", user='etherpad', mode='600')
+    util.put("config/etherpad/settings.json", "/var/www/etherpad", user='etherpad', mode='644')
+    if not files.exists("/var/www/etherpad/var/sqlite.db"):
+        sudo("mkdir -p /var/www/etherpad/var", user='etherpad')
+        with cd("/var/www/etherpad"):
+            sudo("npm install sqlite3")
+        sudo("rsync -av burn.za3k.com::etherpad --delete /var/www/etherpad/var", user='etherpad')
+    supervisord.ensure()
+    supervisord.ensure_config("config/supervisor/etherpad.conf")
+    supervisord.update()
 
     # forsale
     nginx.ensure_site('config/nginx/forsale')

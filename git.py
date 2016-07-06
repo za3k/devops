@@ -18,26 +18,32 @@ def ensure_git():
     select_package("apt")
     already_installed = package_ensure(["git"])
 
-def ensure_clone(remote, target, user=None):
-    if files.exists(target):
+def ensure_clone(remote, target, user=None, commit=None):
+    if files.exists(target) and  commit is None:
         with cd(target):
             runorsuch('git pull', user=user)
+    elif files.exists(target) and commit is not None:
+        with cd(target):
+            runorsuch('git fetch', user=user)
     else:
         clone(remote, target, user=user)
+    if commit is not None:
+        with cd(target):
+            runorsuch('git checkout {}'.format(commit), user=user)
 
-def ensure_clone_github(repository, target, user=None, use_https=True):
+def ensure_clone_github(repository, target, user=None, use_https=True, **kwargs):
     if use_https:
         remote="https://github.com/{repository}.git".format(repository=repository)
     else:
         remote="git@github.com:{repository}.git".format(repository=repository)
-    ensure_clone(remote, target, user=user)
+    ensure_clone(remote, target, user=user, **kwargs)
 
-def ensure_clone_za3k(repository, target, user=None, use_https=True):
+def ensure_clone_za3k(repository, target, user=None, use_https=True, **kwargs):
     if use_https:
         remote="https://git.za3k.com/{repository}.git".format(repository=repository)
     else:
         remote="deadtree.xen.prgmr.com:/git/{repository}.git".format(repository=repository)
-    ensure_clone(remote, target, user=user)
+    ensure_clone(remote, target, user=user, **kwargs)
 
 def clone(remote, target, user=None):
     runorsuch('git clone "{remote}" "{target}"'.format(remote=remote, target=target), user=user)
