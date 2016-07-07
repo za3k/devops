@@ -1,6 +1,8 @@
 #!/usr/bin/python2
 from __future__ import absolute_import
 from __future__ import print_function
+import sys
+sys.dont_write_bytecode = True
 
 from fabric.api import run, env, sudo, put, get, cd, settings, hosts
 from fabric.contrib import files
@@ -214,6 +216,8 @@ def deadtree():
     # colony on the moon
     sudo("rsync -av burn.za3k.com::colony --delete /var/www/colony", user='nobody')
     # |-- status.za3k.com
+    sudo("mkdir -p /var/www/status && chmod 755 /var/www/status")
+    util.put("/srv/keys/backup_check", "/var/www/status", user='fcgiwrap', mode='600')
+    #util.put("/srv/keys/backup_check.pub", "/var/www/status", user='fcgiwrap', mode='644')
     package_ensure(["parallel", "curl"])
-
     nginx.reload()
