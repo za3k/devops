@@ -8,7 +8,7 @@ from fabric.api import run, env, sudo, put, get, cd, settings, hosts
 from fabric.contrib import files
 from cuisine import dir_ensure, dir_exists, group_ensure, group_user_ensure, mode_sudo, package_ensure, user_ensure
 from StringIO import StringIO
-import apt, git, mx, nginx, node, ruby, ssh, supervisord, util
+import apt, git, mx, nginx, node, ruby, ssh, supervisord, util, znc
 
 env.shell = '/bin/sh -c'
 env.use_ssh_config = True
@@ -27,6 +27,7 @@ def burn():
     It runs:
         git.za3k.com: HTTPS access for cloning
         burn.za3k.com: SCP access for backups and git commits
+                       rsync access for backups and public data
     """
     # Daily
     #    * rsync -rltp "$@" --delete --chmod=D755,F644 /data/archive/tarragon.latest/home/zachary/books/ /data/books
@@ -48,7 +49,7 @@ def corrupt():
             files.append('/home/email/.ssh/authorized_keys', public_key)
 
         # Set up postgres, postfix, dovecot, spamassassin
-        mx.ensure(restore=True)
+        #mx.ensure(restore=True)
 
         # Remind zachary to change their email password
 
@@ -56,7 +57,7 @@ def corrupt():
         # Remind zachary to change their rDNS record to point to za3k.com
 
         # znc.za3k.com
-
+        znc.ensure()
 
 # fab -H deadtree
 # Run this on Debian 8

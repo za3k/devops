@@ -60,6 +60,8 @@ ipt -A TCP    -p TCP --dport 587 -j ACCEPT
 ipt -A TCP    -p TCP --dport 143 -j ACCEPT
 # Allow ManageSieve
 ipt -A TCP    -p TCP --dport 4190 -j ACCEPT
+# Allow ZNC
+ipt -A TCP    -p TCP --dport 10000 -j ACCEPT
 # Allow DNS
 # ipt -A UDP    -p UDP --dport 53 -j ACCEPT
 
