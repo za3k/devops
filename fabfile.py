@@ -103,7 +103,7 @@ def deadtree():
     with cd("/var/lib/nsd"):
         sudo("touch /var/lib/nsd/moreorcs.com.zone && chown nsd:nsd /var/lib/nsd/moreorcs.com.zone")
     node.ensure()
-    put("config/ddns/moreorcs.com.zonetemplate", "/etc/nsd", mode='640', use_sudo=True)
+    put("config/ddns/moreorcs.com.zonetemplate", "/etc/nsd", mode='644', use_sudo=True)
     supervisord.ensure()
     git.ensure_clone_github('thingless/ddns', '/var/lib/nsd/ddns', user='nsd')
     supervisord.ensure_config("config/supervisor/ddns.conf")
