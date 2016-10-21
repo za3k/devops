@@ -1,0 +1,16 @@
+To generate a key:
+    openssl genrsa -out ${DOMAIN}.key 4096
+Make sure to keep it private!
+
+To generate a CSR (Certificate Signing Request from a key):
+    openssl req -new -key ${DOMAIN}.key -out ${DOMAIN}.csr -subj "/C=US/ST=/L=/O=/CN=${DOMAIN}" -sha512
+
+The StartSSL certificate will generate a certificate in exchange for a certificate signing request. Then...
+To generate the .pem files in this directory, concatenate
+ - server certificate (.crt)
+ - intermediate certificate (sca.server1.crt)
+   # wget https://www.startssl.com/certs/sca.server1.crt 
+ - ca certficate is left out, or some browsers will complain
+   # https://www.startssl.com/certs/ca.crt
+
+    cat ${DOMAIN}.crt sca.server1.crt >${DOMAIN}.pem

@@ -1,9 +1,23 @@
+- Enable bouncer
+- Add automatic deadtree backup
+- Fix blog.za3k.com uploaded files from backup
+- Add automatic MySQL backup/restore
+- Add automatic postgres backup/restore
 - Add a certificate for thinkingtropes.com
 - Re-enable library card catalog
 - Add github archiving section
 - Enable .view files on za3k.com
 - Enable .md files on za3k.com
 - Enable automatic za3k.com repo sync (push to deploy)
-- Enable automatic za3k.com github repo sync
-- Add automatic MySQL backup/restore
-- Add automatic postgres backup/restore
+- burn:git -> github push
+    - Enable automatic za3k.com github repo sync
+- Make sure tron's github-archive backup is running
+- Make sure the library sync is reasonably up to date
+- Add sync script during tarragon backup to /data/books
+- Add sync script on deadtree for burn:/data/books -> deadtree:/var/www/library
+- Fix keybase proofs (DNS) for
+    - justusemake.com
+    - thinkingtropes.com
+    - thisisashell.com
+- Put DDNS on its own IP
+- Add irc.za3k.com
