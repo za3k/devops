@@ -109,4 +109,5 @@ def _spamassassin():
     put("config/spamassassin/spamassassin", "/etc/default", mode='644')
     put("config/spamassassin/spamassassin-localspam", "/etc/cron.daily", mode='755')
     put("config/spamassassin/local.cf", "/etc/spamassassin", mode='644')
+    run("update-rc.d spamassassin enable")
     run("systemctl restart spamassassin")
