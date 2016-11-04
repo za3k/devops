@@ -5,12 +5,19 @@ from __future__ import print_function
 from fabric.api import run, env, sudo, put, get, cd, settings, hosts
 from fabric.contrib import files
 from cuisine import dir_ensure, group_ensure, mode_sudo
-import random, string
+import random, string, util
 
-def put_cert(cert):
+def put_csr(csr):
+    with mode_sudo():
+        dir_ensure('/etc/ssl/csr', mode='1777')
+    return put(csr, '/etc/ssl/csr', mode='0644')[0]
+
+def put_cert(cert, user=None):
     with mode_sudo():
         dir_ensure('/etc/ssl/certs', mode='1777')
-    return put(cert, '/etc/ssl/certs', mode='0644')[0]
+    if user is None:
+        user = 'root'
+    return util.put(cert, '/etc/ssl/certs', mode='0644', user=user)[0]
 
 def put_key(key, **kwargs):
     with mode_sudo():

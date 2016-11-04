@@ -31,15 +31,26 @@ def reload():
     """Reload nginx and apply new configuration"""
     sudo("systemctl reload nginx")
 
-def ensure_site(config_file, cert=None, key=None, enabled=True):
+def ensure_site(config_file, cert=None, csr=None, key=None, letsencrypt=False, domain=None, enabled=True):
+    assert not (letsencrypt and not enabled) # Online verification won't work
+    assert not (letsencrypt and not cert) # As a hack, use an expired cert to bootstrap
+    assert not (letsencrypt and not csr) # We've opted to use CSR as the input to acme.sh
+    assert not (letsencrypt and not domain) # we can't infer the well-known-path on disk without some extra help
     ensure_sites_available()
     placed_config = put(config_file, '/etc/nginx/sites-available')[0]
-    if cert is not None:
-        crypto.put_cert(cert)
     if key is not None:
         crypto.put_key(key)
+    if csr is not None:
+        remote_csr = crypto.put_csr(csr)
+    if cert is not None:
+        crypto.put_cert(cert)
     if enabled:
         sudo("ln -s -f {config} /etc/nginx/sites-enabled".format(config=placed_config))
+    if letsencrypt:
+        import letsencrypt
+        reload() # Awkward... we need this to enable a site enough for the well-known path to work
+        letsencrypt.add_csr(remote_csr, domain)
+        reload() # And allow the key
 
 def ensure_fcgiwrap(children=4):
     select_package("apt")

@@ -8,7 +8,7 @@ from fabric.api import run, env, sudo, put, get, cd, settings, hosts
 from fabric.contrib import files
 from cuisine import dir_ensure, dir_exists, group_ensure, group_user_ensure, mode_sudo, package_ensure, user_ensure
 from StringIO import StringIO
-import apt, git, mx, nginx, node, ruby, ssh, supervisord, util, znc
+import apt, git, letsencrypt, mx, nginx, node, ruby, ssh, supervisord, util, znc
 
 env.shell = '/bin/sh -c'
 env.use_ssh_config = True
@@ -49,7 +49,7 @@ def corrupt():
             files.append('/home/email/.ssh/authorized_keys', public_key)
 
         # Set up postgres, postfix, dovecot, spamassassin
-        #mx.ensure(restore=True)
+        mx.ensure(restore=True)
 
         # Remind zachary to change their email password
 
@@ -85,6 +85,9 @@ def deadtree():
     nginx.ensure_fcgiwrap(children=4)
     if not already_installed:
         nginx.restart() # IPv[46] listener only changes on restart
+
+    # Set up letsencrypt
+    letsencrypt.ensure() 
 
     # Set up authorization to back up to the data server
     #public_key = ssh.ensure_key('/root/.ssh/id_rsa')
@@ -170,8 +173,9 @@ def deadtree():
     # library.za3k.com -> website
     #                  -> sync script
     #                  -> card catalog
-    user_ensure('library')
-    group_ensure('library')
+    # MUST be user 2001 to match remote rsync
+    user_ensure('library', uid=2001)
+    group_ensure('library', gid=2001)
     group_user_ensure('library', 'library')
     with mode_sudo():
         dir_ensure('/var/www/library', mode='755')
@@ -190,7 +194,7 @@ def deadtree():
     git.ensure_clone_github('za3k/moreorcs', '/var/www/moreorcs', user='moreorcs')
 
     # nanowrimo.za3k.com
-    nginx.ensure_site('config/nginx/nanowrimo.za3k.com', cert='config/certs/nanowrimo.za3k.com.pem', key='config/keys/nanowrimo.za3k.com.key')
+    nginx.ensure_site('config/nginx/nanowrimo.za3k.com', csr='config/certs/nanowrimo.za3k.com.csr', key='config/keys/nanowrimo.za3k.com.key', domain="nanowrimo.za3k.com", letsencrypt=True, cert="config/certs/nanowrimo.za3k.com.pem")
     util.put('data/nanowrimo', '/var/www', user='nobody', mode='755')
 
     # nntp.za3k.com

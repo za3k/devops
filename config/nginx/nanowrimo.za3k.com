@@ -2,7 +2,13 @@
 server {
     listen [::]:80;
     server_name    nanowrimo.za3k.com;
-    return         302 https://$host$request_uri;
+    location ~ /.well-known {
+        allow all;
+        root /var/www/well-known/nanowrimo.za3k.com;
+    }
+    location / {
+        return         302 https://$host$request_uri;
+    }
 }
 
 server {
