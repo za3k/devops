@@ -7,7 +7,13 @@
 server {
     listen [::]:80;
     server_name    library.za3k.com;
-    return         302 https://$host$request_uri;
+    location ~ /.well-known {
+        allow all;
+        root /var/www/well-known/library.za3k.com;
+    }
+    location / {
+        return         302 https://$host$request_uri;
+    }
 }
 
 server {

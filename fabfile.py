@@ -182,7 +182,7 @@ def deadtree():
     sudo("chown library:library /var/www/library")
     put("config/library/library.sync", "/etc/cron.daily", mode='755', use_sudo=True)
     sudo("/etc/cron.daily/library.sync")
-    nginx.ensure_site('config/nginx/library.za3k.com', cert='config/certs/library.za3k.com.pem', key='config/keys/library.za3k.com.key')
+    nginx.ensure_site('config/nginx/library.za3k.com', csr='config/certs/library.za3k.com.csr', key='config/keys/library.za3k.com.key', domain="library.za3k.com", letsencrypt=True, cert="config/certs/library.za3k.com.pem")
 
     # logs (nginx) and analysis (analog)
     # mint sync
