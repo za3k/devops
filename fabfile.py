@@ -137,7 +137,7 @@ def deadtree():
     group_ensure('etherpad')
     group_user_ensure('etherpad', 'etherpad')
     git.ensure_clone_github('ether/etherpad-lite', '/var/www/etherpad', commit='1.6.0', user='etherpad')
-    nginx.ensure_site('config/nginx/etherpad.za3k.com', cert='config/certs/etherpad.za3k.com.pem', key='config/keys/etherpad.za3k.com.key')
+    nginx.ensure_site('config/nginx/etherpad.za3k.com', csr='config/certs/etherpad.za3k.com.csr', key='config/keys/etherpad.za3k.com.key', domain="etherpad.za3k.com", letsencrypt=True, cert="config/certs/etherpad.za3k.com.pem")
     util.put("config/etherpad/APIKEY.txt", "/var/www/etherpad", user='etherpad', mode='600')
     util.put("config/etherpad/settings.json", "/var/www/etherpad", user='etherpad', mode='644')
     if not files.exists("/var/www/etherpad/var/sqlite.db"):
@@ -197,7 +197,7 @@ def deadtree():
     nginx.ensure_site('config/nginx/nanowrimo.za3k.com', csr='config/certs/nanowrimo.za3k.com.csr', key='config/keys/nanowrimo.za3k.com.key', domain="nanowrimo.za3k.com", letsencrypt=True, cert="config/certs/nanowrimo.za3k.com.pem")
     util.put('data/nanowrimo', '/var/www', user='nobody', mode='755')
 
-    # nntp.za3k.com
+    # nntp.za3k.com - Discontinued
     # petchat.za3k.com
     nginx.ensure_site('config/nginx/petchat.za3k.com')
     if not files.exists('/var/www/petchat'):
