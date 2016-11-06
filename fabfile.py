@@ -166,10 +166,6 @@ def deadtree():
     nginx.ensure_site('config/nginx/jsfail.com')
     util.put('data/jsfail', '/var/www', 'jsfail', mode='755')
 
-    # justusemake.com
-    nginx.ensure_site('config/nginx/justusemake.com', cert='config/certs/justusemake.com.pem', key='config/keys/justusemake.com.key')
-    util.put('data/justusemake', '/var/www', 'nobody', mode='755')
-
     # library.za3k.com -> website
     #                  -> sync script
     #                  -> card catalog
