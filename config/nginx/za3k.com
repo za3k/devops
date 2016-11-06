@@ -2,7 +2,13 @@
 server {
     listen [::]:80;
     server_name    za3k.com;
-    return         301 https://$host$request_uri;
+    location ~ /.well-known {
+        allow all;
+        root /var/www/well-known/za3k.com;
+    }
+    location / {
+        return         301 https://$host$request_uri;
+    }
 }
     
 server {

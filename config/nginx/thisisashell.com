@@ -7,7 +7,13 @@ upstream thisisashell {
 server {
     listen [::]:80;
     server_name    thisisashell.com;
-    return         301 https://$host$request_uri;
+    location ~ /.well-known {
+        allow all;
+        root /var/www/well-known/thisisashell.com;
+    }
+    location / {
+        return         301 https://$host$request_uri;
+    }
 }
 
 server {

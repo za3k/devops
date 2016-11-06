@@ -119,13 +119,13 @@ def deadtree():
     package_ensure(["nsd"])
     put("config/ddns/nsd.conf", "/etc/nsd", mode='644', use_sudo=True)
     sudo("systemctl restart nsd")
-    nginx.ensure_site('config/nginx/ddns.za3k.com', cert='config/certs/ddns.za3k.com.pem', key='config/keys/ddns.za3k.com.key')
+    nginx.ensure_site('config/nginx/ddns.za3k.com', csr='config/certs/ddns.za3k.com.csr', key='config/keys/ddns.za3k.com.key', domain="ddns.za3k.com", letsencrypt=True, cert="config/certs/ddns.za3k.com.pem")
     nginx.reload()
 
     # blog.za3k.com
     package_ensure(["php5-fpm", "mysql-server", "php5-mysql"])
 
-    nginx.ensure_site('config/nginx/blog.za3k.com', cert='config/certs/blog.za3k.com.pem', key='config/keys/blog.za3k.com.key')
+    nginx.ensure_site('config/nginx/blog.za3k.com', cert='config/certs/blog.za3k.com.pem', key='config/keys/blog.za3k.com.key', domain="blog.za3k.com", letsencrypt=True, csr="config/certs/blog.za3k.com.csr")
     git.ensure_clone_za3k('za3k_blog', '/var/www/za3k_blog', user='fcgiwrap')
     # TODO: Replace a database-specific password or make it more obvious it's not used? Currently we're using user ACLs and this gets ignored anyway, I think?
     # [Manual] Load the blog database from backup at /srv/mysql -> /var/lib/mysql
@@ -186,7 +186,7 @@ def deadtree():
     user_ensure('moreorcs')
     group_ensure('moreorcs')
     group_user_ensure('moreorcs', 'moreorcs')
-    nginx.ensure_site('config/nginx/moreorcs.com', cert='config/certs/moreorcs.com.pem', key='config/keys/moreorcs.com.key')
+    nginx.ensure_site('config/nginx/moreorcs.com', cert='config/certs/moreorcs.com.pem', key='config/keys/moreorcs.com.key', domain="moreorcs.com", letsencrypt=True, csr="config/certs/moreorcs.com.csr")
     git.ensure_clone_github('za3k/moreorcs', '/var/www/moreorcs', user='moreorcs')
 
     # nanowrimo.za3k.com
@@ -204,12 +204,15 @@ def deadtree():
     nginx.ensure_site('config/nginx/thinkingtropes.com')
     util.put('data/thinkingtropes', '/var/www', user='nobody', mode='755')
 
+    # thisisashell.com
+    nginx.ensure_site('config/nginx/thisisashell.com', csr='config/certs/thisisashell.com.csr', key='config/keys/thisisashell.com.key', domain="thisisashell.com", letsencrypt=True, cert="config/certs/thisisashell.com.pem")
+
     # twitter archive
     # za3k.com
     user_ensure('za3k')
     group_ensure('za3k')
     group_user_ensure('za3k', 'za3k')
-    nginx.ensure_site('config/nginx/za3k.com', cert='config/certs/za3k.com.pem', key='config/keys/za3k.com.key')
+    nginx.ensure_site('config/nginx/za3k.com', cert='config/certs/za3k.com.pem', key='config/keys/za3k.com.key', domain="za3k.com", letsencrypt=True, csr="config/certs/za3k.com.csr")
     git.ensure_clone_za3k('za3k', '/var/www/za3k', user='za3k')
     # Markdown .md
     ruby.ensure()
