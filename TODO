@@ -24,3 +24,5 @@
 - Re-Enable automatic twitter backup and sync to web server
 - Add TLS for jsfail.com
 - Fix publishing.za3k.com
+- Switch corrupt to letsencrypt
+
