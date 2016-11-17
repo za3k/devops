@@ -225,3 +225,10 @@ def deadtree():
     #util.put("/srv/keys/backup_check.pub", "/var/www/status", user='fcgiwrap', mode='644')
     package_ensure(["parallel", "curl"])
     nginx.reload()
+
+def equilibriate():
+    """Equilibriate runs games."""
+
+    # Set up the firewall
+    put("config/firewalls/equilibriate.sh", "/usr/local/bin", use_sudo=True)
+    sudo("sh /usr/local/bin/equilibriate.sh")
