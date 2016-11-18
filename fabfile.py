@@ -8,7 +8,7 @@ from fabric.api import run, env, sudo, put, get, cd, settings, hosts
 from fabric.contrib import files
 from cuisine import dir_ensure, dir_exists, group_ensure, group_user_ensure, mode_sudo, package_ensure, user_ensure
 from StringIO import StringIO
-import apt, git, letsencrypt, mx, nginx, node, ruby, ssh, supervisord, util, znc
+import apt, git, letsencrypt, mx, nginx, node, path, ruby, ssh, supervisord, util, znc
 
 env.shell = '/bin/sh -c'
 env.use_ssh_config = True
@@ -228,7 +228,17 @@ def deadtree():
 
 def equilibriate():
     """Equilibriate runs games."""
+    # Out of scope: Set up DNS (including poll script), ssh, sudo
 
     # Set up the firewall
     put("config/firewalls/equilibriate.sh", "/usr/local/bin", use_sudo=True)
     sudo("sh /usr/local/bin/equilibriate.sh")
+
+    # Set up java for minecraft
+    if not path.has('java'):
+        sudo('echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee /etc/apt/sources.list.d/webupd8team-java.list')
+        sudo('echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee -a /etc/apt/sources.list.d/webupd8team-java.list')
+        sudo('apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886')
+        sudo('apt-get update')
+        sudo('echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections')
+        package_ensure(["oracle-java8-installer"]) # fails

@@ -25,4 +25,5 @@
 - Add TLS for jsfail.com
 - Fix publishing.za3k.com
 - Switch corrupt to letsencrypt
-
+- Fix git.za3k.com cert
+- Fix letsencypt certs to have a better cert chain
