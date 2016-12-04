@@ -44,9 +44,16 @@ def corrupt():
         run("sh /usr/local/bin/corrupt.sh")
 
         # Set up authorization to back up email to the data server
-        public_key = ssh.ensure_key('/root/.ssh/id_rsa')
-        with settings(user='email', host_string='burn'):
-            files.append('/home/email/.ssh/authorized_keys', public_key)
+        public_key = ssh.ensure_key('/var/local/burn-backup')
+        with settings(user='corrupt', host_string='burn'):
+            files.append('/home/corrupt/.ssh/authorized_keys', public_key)
+        put("config/backup/sshconfig-corrupt.sh", "/root/.ssh/config")
+
+        # Set up backup
+        package_ensure(["rsync"])
+        put("config/backup/generic-backup.sh", "/var/local", mode='0755')
+        put("config/backup/backup-exclude-base", "/var/local/backup-exclude", mode='0644')
+        put("config/backup/backup-corrupt.sh", "/etc/cron.daily/backup-corrupt", mode='0644')
 
         # Set up postgres, postfix, dovecot, spamassassin
         mx.ensure(restore=True)
