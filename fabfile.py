@@ -86,6 +86,18 @@ def deadtree():
     put("config/firewalls/deadtree.sh", "/usr/local/bin", use_sudo=True)
     sudo("sh /usr/local/bin/deadtree.sh")
 
+    # Set up authorization to back up email to the data server
+    public_key = ssh.ensure_key('/var/local/burn-backup', use_sudo=True)
+    with settings(user='deadtree', host_string='burn'):
+        files.append('/home/deadtree/.ssh/authorized_keys', public_key)
+    util.put("config/backup/sshconfig-deadtree", "/root/.ssh/config", user='root')
+
+    # Set up backup
+    package_ensure(["rsync"])
+    util.put("config/backup/generic-backup.sh", "/var/local", mode='0755', user='root')
+    util.put("config/backup/backup-exclude-base", "/var/local/backup-exclude", mode='0644', user='root')
+    util.put("config/backup/backup-deadtree.sh", "/etc/cron.daily/backup-deadtree", mode='0644', user='root')
+
     # Set up nginx
     already_installed = nginx.ensure()
     nginx.ensure_site('config/nginx/default', cert='config/certs/za3k.com.pem', key='config/keys/blog.za3k.com.key')
