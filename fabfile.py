@@ -47,13 +47,13 @@ def corrupt():
         public_key = ssh.ensure_key('/var/local/burn-backup')
         with settings(user='corrupt', host_string='burn'):
             files.append('/home/corrupt/.ssh/authorized_keys', public_key)
-        put("config/backup/sshconfig-corrupt.sh", "/root/.ssh/config")
+        put("config/backup/sshconfig-corrupt", "/root/.ssh/config")
 
         # Set up backup
         package_ensure(["rsync"])
         put("config/backup/generic-backup.sh", "/var/local", mode='0755')
         put("config/backup/backup-exclude-base", "/var/local/backup-exclude", mode='0644')
-        put("config/backup/backup-corrupt.sh", "/etc/cron.daily/backup-corrupt", mode='0644')
+        put("config/backup/backup-corrupt.sh", "/etc/cron.daily/backup-corrupt", mode='0755')
 
         # Set up postgres, postfix, dovecot, spamassassin
         mx.ensure(restore=True)
@@ -96,7 +96,7 @@ def deadtree():
     package_ensure(["rsync"])
     util.put("config/backup/generic-backup.sh", "/var/local", mode='0755', user='root')
     util.put("config/backup/backup-exclude-base", "/var/local/backup-exclude", mode='0644', user='root')
-    util.put("config/backup/backup-deadtree.sh", "/etc/cron.daily/backup-deadtree", mode='0644', user='root')
+    util.put("config/backup/backup-deadtree.sh", "/etc/cron.daily/backup-deadtree", mode='0755', user='root')
 
     # Set up nginx
     already_installed = nginx.ensure()
@@ -245,13 +245,25 @@ def deadtree():
     package_ensure(["parallel", "curl"])
     nginx.reload()
 
-def equilibriate():
-    """Equilibriate runs games."""
+def equilibrate():
+    """Equilibrate runs games."""
     # Out of scope: Set up DNS (including poll script), ssh, sudo
 
     # Set up the firewall
-    put("config/firewalls/equilibriate.sh", "/usr/local/bin", use_sudo=True)
-    sudo("sh /usr/local/bin/equilibriate.sh")
+    put("config/firewalls/equilibrate.sh", "/usr/local/bin", use_sudo=True)
+    sudo("sh /usr/local/bin/equilibrate.sh")
+
+    # Set up authorization to back up email to the data server
+    public_key = ssh.ensure_key('/var/local/burn-backup', use_sudo=True)
+    with settings(user='equilibrate', host_string='burn'):
+        files.append('/home/equilibrate/.ssh/authorized_keys', public_key)
+    util.put("config/backup/sshconfig-equilibrate", "/root/.ssh/config", user='root')
+
+    # Set up backup
+    package_ensure(["rsync"])
+    util.put("config/backup/generic-backup.sh", "/var/local", mode='0755', user='root')
+    util.put("config/backup/backup-exclude-base", "/var/local/backup-exclude", mode='0644', user='root')
+    util.put("config/backup/backup-equilibrate.sh", "/etc/cron.daily/backup-equilibrate", mode='0755', user='root')
 
     # Set up java for minecraft
     if not path.has('java'):
