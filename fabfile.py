@@ -233,6 +233,13 @@ def deadtree():
     group_user_ensure('za3k', 'za3k')
     nginx.ensure_site('config/nginx/za3k.com', cert='config/certs/za3k.com.pem', key='config/keys/za3k.com.key', domain="za3k.com", letsencrypt=True, csr="config/certs/za3k.com.csr")
     git.ensure_clone_za3k('za3k', '/var/www/za3k', user='za3k')
+    with settings(user='zachary', host_string='burn'):
+        actual_key = ssh.get_public_key("/data/git/za3k.git/hooks/deadtree_key")
+    ssh_line = 'command="{command}",no-port-forwarding,no-x11-forwarding,no-agent-forwarding {key}'.format(
+        command="/usr/bin/git -C /var/www/za3k pull",
+        key=actual_key)
+    files.append('/home/za3k/.ssh/authorized_keys', ssh_line, use_sudo=True)
+
     # Markdown .md
     ruby.ensure()
     ruby.ensure_gems(["redcarpet"])
