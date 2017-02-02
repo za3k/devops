@@ -1,29 +1,29 @@
-- Enable bouncer
-- Add automatic deadtree backup
-- Fix blog.za3k.com uploaded files from backup
-- Add automatic MySQL backup/restore
-- Add automatic postgres backup/restore
-- Add a certificate for thinkingtropes.com
 - Re-enable library card catalog
 - Add github archiving section
 - Enable .view files on za3k.com
-- Enable .md files on za3k.com
-- Enable automatic za3k.com repo sync (push to deploy)
-- burn:git -> github push
-    - Enable automatic za3k.com github repo sync
+- Switch .md, .view on za3k.com to be static generation?
 - Make sure tron's github-archive backup is running
 - Make sure the library sync is reasonably up to date
-- Add sync script during tarragon backup to /data/books
-- Add sync script on deadtree for burn:/data/books -> deadtree:/var/www/library
+- Put DDNS on its own IP
+- Add irc.za3k.com
+- Fix publishing.za3k.com
+- Re-Enable automatic twitter backup and sync to web server
+
 - Fix keybase proofs (DNS) for
     - justusemake.com
     - thinkingtropes.com
     - thisisashell.com
-- Put DDNS on its own IP
-- Add irc.za3k.com
-- Re-Enable automatic twitter backup and sync to web server
-- Add TLS for jsfail.com
-- Fix publishing.za3k.com
-- Switch corrupt to letsencrypt
 - Fix git.za3k.com cert
-- Fix letsencypt certs to have a better cert chain
+- Add a certificate for thinkingtropes.com
+- Add TLS for jsfail.com
+- Switch corrupt to letsencrypt
+
+- Add automatic MySQL backup/restore
+- Add automatic postgres backup/restore
+- Backup/restore deadtree data directories
+    /var/www/za3k_blog/wp-content/uploads
+    /var/www/etherpad/var
+    /var/lib/mysql
+- Backup/restore corrupt data directories
+    /var/znc/users/*/moddata/log
+    /var/lib/postgresql/9.4/main
