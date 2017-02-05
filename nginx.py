@@ -4,7 +4,7 @@ from __future__ import print_function
 
 from fabric.api import run, env, sudo, put, get, cd, settings, hosts
 from cuisine import dir_ensure, group_ensure, group_user_ensure, mode_sudo, select_package, package_ensure, user_ensure
-import crypto
+import crypto, util
 
 def ensure():
     """Ensure nginx is installed"""
@@ -56,10 +56,15 @@ def ensure_fcgiwrap(children=4):
     select_package("apt")
     package_ensure(["fcgiwrap"]) # On debian will automatically be enabled
     # fcgi can't run status script because its default user (www-data) has no login shell--not sure why exactly but work around it by making a new user
-    user_ensure('fcgiwrap')
+    user_ensure('fcgiwrap', shell="/bin/sh")
     group_ensure('fcgiwrap')
     group_user_ensure('fcgiwrap', 'fcgiwrap')
+    
+    # Needed because of Debian bug https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=792705. Fastcgi 1.1.0-6 (unstable as of writing) fixes this bug.
+    util.put("config/systemd/fcgiwrap.service", "/etc/systemd/system", mode='0644', user='root')
+    # Not sure these two lines actually do anything
     sudo('sed -i "s/www-data/fcgiwrap/" /lib/systemd/system/fcgiwrap.service')
     sudo('echo "FCGI_CHILDREN={}" > /etc/default/fcgiwrap'.format(children))
+
     sudo('systemctl daemon-reload')
     sudo('/etc/init.d/fcgiwrap restart')
