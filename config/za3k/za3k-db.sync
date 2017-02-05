@@ -1,0 +1,2 @@
+#!/bin/sh
+sudo -u za3k rsync -a burn.za3k.com::za3k-db --delete /var/www/za3k/cgi-bin/db

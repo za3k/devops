@@ -31,6 +31,7 @@ def burn():
     """
     # Daily
     #    * rsync -rltp "$@" --delete --chmod=D755,F644 /data/archive/tarragon.latest/home/zachary/books/ /data/books
+    #    * rsync -rltp "$@" --delete --chmod=D755,F644 /data/archive/tarragon.latest/srv/za3k-db/ /data/dbs/za3k-db
     # gmail backup
     pass
 
@@ -243,6 +244,9 @@ def deadtree():
     # Markdown .md
     ruby.ensure()
     ruby.ensure_gems(["redcarpet"])
+    # Databases .view
+    put("config/za3k/za3k-db.sync", "/etc/cron.daily", mode='755', use_sudo=True)
+    sudo("/etc/cron.daily/za3k-db.sync")
     # colony on the moon
     sudo("rsync -av burn.za3k.com::colony --delete /var/www/colony", user='nobody')
     # |-- status.za3k.com

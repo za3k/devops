@@ -1,7 +1,5 @@
 - Re-enable library card catalog
 - Add github archiving section
-- Enable .view files on za3k.com
-- Switch .md, .view on za3k.com to be static generation?
 - Make sure tron's github-archive backup is running
 - Make sure the library sync is reasonably up to date
 - Put DDNS on its own IP
@@ -27,3 +25,4 @@
 - Backup/restore corrupt data directories
     /var/znc/users/*/moddata/log
     /var/lib/postgresql/9.4/main
+    /var/mail/vmail
