@@ -33,6 +33,7 @@ def burn():
     #    * rsync -rltp "$@" --delete --chmod=D755,F644 /data/archive/tarragon.latest/home/zachary/books/ /data/books
     #    * rsync -rltp "$@" --delete --chmod=D755,F644 /data/archive/tarragon.latest/srv/za3k-db/ /data/dbs/za3k-db
     # gmail backup
+    # letsencrypt for git.za3k.com cert
     pass
 
 # fab -H corrupt corrupt
@@ -257,7 +258,7 @@ def deadtree():
     util.put("/srv/keys/backup_check", "/var/www/status", user='fcgiwrap', mode='600')
     util.put("/srv/keys/comcast.env", "/etc", user='fcgiwrap', mode='600')
     #util.put("/srv/keys/backup_check.pub", "/var/www/status", user='fcgiwrap', mode='644')
-    package_ensure(["parallel", "curl"])
+    package_ensure(["parallel", "curl", "python-requests"])
     nginx.reload()
 
 def equilibrate():
