@@ -62,6 +62,10 @@ server {
         set $processor /cgi-bin/view.cgi;
         fastcgi_pass  unix:/var/run/fcgiwrap.socket;
     }
+    location ~ \.sc.txt$ {
+        set $processor /cgi-bin/sc.txt.cgi;
+        fastcgi_pass  unix:/var/run/fcgiwrap.socket;
+    }
     location ~ \.status$ {
         set $processor /cgi-bin/status.cgi;
         fastcgi_pass  unix:/var/run/fcgiwrap.socket;

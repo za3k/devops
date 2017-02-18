@@ -245,13 +245,17 @@ def deadtree():
     ruby.ensure()
     ruby.ensure_gems(["redcarpet"])
     # Databases .view
+    package_ensure(["sqlite3"])
     put("config/za3k/za3k-db.sync", "/etc/cron.daily", mode='755', use_sudo=True)
     sudo("/etc/cron.daily/za3k-db.sync")
     # colony on the moon
     sudo("rsync -av burn.za3k.com::colony --delete /var/www/colony", user='nobody')
+    # .sc
+    package_ensure(["sc"])
     # |-- status.za3k.com
     sudo("mkdir -p /var/www/status && chmod 755 /var/www/status")
     util.put("/srv/keys/backup_check", "/var/www/status", user='fcgiwrap', mode='600')
+    util.put("/srv/keys/comcast.env", "/etc", user='fcgiwrap', mode='600')
     #util.put("/srv/keys/backup_check.pub", "/var/www/status", user='fcgiwrap', mode='644')
     package_ensure(["parallel", "curl"])
     nginx.reload()
