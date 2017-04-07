@@ -26,3 +26,5 @@
     /var/znc/users/*/moddata/log
     /var/lib/postgresql/9.4/main
     /var/mail/vmail
+
+- Fix avalanche github backup (currently hard disk is full)
