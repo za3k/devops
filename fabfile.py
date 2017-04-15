@@ -19,8 +19,7 @@ def avalanche():
     # Set up the firewall
     put("config/firewalls/avalanche.sh", "/usr/local/bin", use_sudo=True)
     sudo("sh /usr/local/bin/avalanche.sh")
-
-    pass
+    put("config/firewalls/iptables", "/etc/network/if-pre-up.d/", use_sudo=True, mode='0755')
 
 def burn():
     """Burn is the backup machine and cannot be configured automatically for safety reasons.
