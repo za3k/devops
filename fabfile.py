@@ -43,6 +43,7 @@ def corrupt():
         # Set up the firewall
         put("config/firewalls/corrupt.sh", "/usr/local/bin")
         run("sh /usr/local/bin/corrupt.sh")
+        put("config/firewalls/iptables", "/etc/network/if-pre-up.d/", use_sudo=True, mode='0755')
 
         # Set up authorization to back up email to the data server
         public_key = ssh.ensure_key('/var/local/burn-backup')
@@ -86,6 +87,7 @@ def deadtree():
     # Set up the firewall
     put("config/firewalls/deadtree.sh", "/usr/local/bin", use_sudo=True)
     sudo("sh /usr/local/bin/deadtree.sh")
+    put("config/firewalls/iptables", "/etc/network/if-pre-up.d/", use_sudo=True, mode='0755')
 
     # Set up authorization to back up email to the data server
     public_key = ssh.ensure_key('/var/local/burn-backup', use_sudo=True)
@@ -267,6 +269,7 @@ def equilibrate():
     # Set up the firewall
     put("config/firewalls/equilibrate.sh", "/usr/local/bin", use_sudo=True)
     sudo("sh /usr/local/bin/equilibrate.sh")
+    put("config/firewalls/iptables", "/etc/network/if-pre-up.d/", use_sudo=True, mode='0755')
 
     # Set up authorization to back up email to the data server
     public_key = ssh.ensure_key('/var/local/burn-backup', use_sudo=True)
