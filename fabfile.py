@@ -280,7 +280,7 @@ def equilibrate():
     # Set up backup
     package_ensure(["rsync"])
     util.put("config/backup/generic-backup.sh", "/var/local", mode='0755', user='root')
-    util.put("config/backup/backup-exclude-equilibrate", "/var/local/backup-exclude", mode='0644', user='root')
+    util.put("config/backup/backup-exclude-base", "/var/local/backup-exclude", mode='0644', user='root')
     util.put("config/backup/backup-equilibrate.sh", "/etc/cron.daily/backup-equilibrate", mode='0755', user='root')
 
     # Set up java for minecraft
