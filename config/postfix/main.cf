@@ -46,7 +46,8 @@ relayhost =
 #mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
 mynetworks_style = host
 mailbox_size_limit = 0
-message_size_limit = 52428800 # 50MB, more than gmail which takes care of 90% of issues
+# 50MB, more than gmail which takes care of 90% of issues
+message_size_limit = 52428800
 recipient_delimiter = +
 inet_interfaces = all
 
