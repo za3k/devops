@@ -280,7 +280,7 @@ def equilibrate():
     # Set up backup
     package_ensure(["rsync"])
     util.put("config/backup/generic-backup.sh", "/var/local", mode='0755', user='root')
-    util.put("config/backup/backup-exclude-base", "/var/local/backup-exclude", mode='0644', user='root')
+    util.put("config/backup/backup-exclude-equilibrate", "/var/local/backup-exclude", mode='0644', user='root')
     util.put("config/backup/backup-equilibrate.sh", "/etc/cron.daily/backup-equilibrate", mode='0755', user='root')
 
     # Set up java for minecraft
@@ -298,3 +298,16 @@ def xenu():
     put("config/firewalls/xenu.sh", "/usr/local/bin", use_sudo=True)
     sudo("sh /usr/local/bin/xenu.sh")
     put("config/firewalls/iptables", "/etc/network/if-pre-up.d/", use_sudo=True, mode='0755')
+
+    # Set up authorization to back up
+    public_key = ssh.ensure_key('/var/local/burn-backup', use_sudo=True)
+    with settings(user='xenu-linux', host_string='burn'):
+        files.append('/home/xenu-linux/.ssh/authorized_keys', public_key)
+    sudo("mkdir -p /root/.ssh")
+    util.put("config/backup/sshconfig-xenu", "/root/.ssh/config", user='root')
+
+    # Set up backup
+    package_ensure(["rsync"])
+    util.put("config/backup/generic-backup.sh", "/var/local", mode='0755', user='root')
+    util.put("config/backup/backup-exclude-xenu", "/var/local/backup-exclude", mode='0644', user='root')
+    util.put("config/backup/backup-xenu.sh", "/etc/cron.daily/backup-xenu", mode='0755', user='root')
