@@ -291,3 +291,10 @@ def equilibrate():
         sudo('apt-get update')
         sudo('echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections')
         package_ensure(["oracle-java8-installer"]) # fails
+
+def xenu():
+    """Xenu runs minecraft."""
+    # Set up the firewall
+    put("config/firewalls/xenu.sh", "/usr/local/bin", use_sudo=True)
+    sudo("sh /usr/local/bin/xenu.sh")
+    put("config/firewalls/iptables", "/etc/network/if-pre-up.d/", use_sudo=True, mode='0755')
