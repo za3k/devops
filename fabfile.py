@@ -1,5 +1,3 @@
-#!/usr/bin/python2
-from __future__ import absolute_import
 from __future__ import print_function
 import sys
 sys.dont_write_bytecode = True
@@ -20,6 +18,8 @@ def avalanche():
     put("config/firewalls/avalanche.sh", "/usr/local/bin", use_sudo=True)
     sudo("sh /usr/local/bin/avalanche.sh")
     put("config/firewalls/iptables", "/etc/network/if-pre-up.d/", use_sudo=True, mode='0755')
+
+    # github-backup setup is manual. Look on github and at cron entry. Backs up to burn:/data/github
 
 def burn():
     """Burn is the backup machine and cannot be configured automatically for safety reasons.
@@ -178,6 +178,8 @@ def deadtree():
     # gipc daily sync
     # github personal backup
     # github repo list
+    put("config/github/github-metadata.sync", "/etc/cron.daily", mode='755', use_sudo=True)
+
     #                  -> updater
     # irc.za3k.com -> irc
     #              -> webchat (qwebirc)
@@ -283,15 +285,6 @@ def equilibrate():
     util.put("config/backup/backup-exclude-base", "/var/local/backup-exclude", mode='0644', user='root')
     util.put("config/backup/backup-equilibrate.sh", "/etc/cron.daily/backup-equilibrate", mode='0755', user='root')
 
-    # Set up java for minecraft
-    if not path.has('java'):
-        sudo('echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee /etc/apt/sources.list.d/webupd8team-java.list')
-        sudo('echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee -a /etc/apt/sources.list.d/webupd8team-java.list')
-        sudo('apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886')
-        sudo('apt-get update')
-        sudo('echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections')
-        package_ensure(["oracle-java8-installer"]) # fails
-
 def xenu():
     """Xenu runs minecraft."""
     # Set up the firewall
@@ -311,3 +304,22 @@ def xenu():
     util.put("config/backup/generic-backup.sh", "/var/local", mode='0755', user='root')
     util.put("config/backup/backup-exclude-xenu", "/var/local/backup-exclude", mode='0644', user='root')
     util.put("config/backup/backup-xenu.sh", "/etc/cron.daily/backup-xenu", mode='0755', user='root')
+
+    # Minecraft prereqs
+    package_ensure(["make", "tmux"])
+    # Set up java for minecraft
+    if not path.has('java'):
+        sudo('echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee /etc/apt/sources.list.d/webupd8team-java.list')
+        sudo('echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee -a /etc/apt/sources.list.d/webupd8team-java.list')
+        sudo('apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886')
+        sudo('apt-get update')
+        sudo('echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections')
+        package_ensure(["oracle-java8-installer"]) # fails
+
+    # Set up nginx
+    already_installed = nginx.ensure()
+    if not already_installed:
+        nginx.restart() # IPv[46] listener only changes on restart
+    util.put("data/minecraft-www", "/var/www", user="minecraft")
+    nginx.ensure_site('config/nginx/minecraft.za3k.com')
+    nginx.reload()

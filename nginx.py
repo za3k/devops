@@ -10,6 +10,8 @@ def ensure():
     """Ensure nginx is installed"""
     select_package("apt")
     already_installed = package_ensure(["nginx"]) # On debian will automatically be enabled
+    if not already_installed:
+        remove_default_sites()
     ensure_sites_available()
     put('config/nginx/nginx.conf', '/etc/nginx', use_sudo=True)
     put('config/nginx/fastcgi_params', '/etc/nginx', use_sudo=True)
@@ -22,6 +24,10 @@ def ensure_sites_available():
     with mode_sudo():
         dir_ensure('/etc/nginx/sites-available', mode='1777') # make sure anyone can add a site
         dir_ensure('/etc/nginx/sites-enabled')
+
+def remove_default_sites():
+    sudo("rm /etc/nginx/sites-available/default")
+    sudo("rm /etc/nginx/sites-enabled/default")
 
 def restart():
     """Restart nginx. Should only be neccesary on ipv[46] switch."""

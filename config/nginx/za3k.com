@@ -29,11 +29,11 @@ server {
     index index.html index.md;
     root /var/www/za3k;
 
-    #location /github {
-    #    alias /var/www/github;
-    #    gzip on;
-    #    gunzip on; # Enables use of .gz files in directory
-    #}
+    location /github/ {
+        alias /var/www/github;
+        gzip on;
+        gunzip on; # Enables use of .gz files in directory
+    }
     location /~colony {
         alias /var/www/colony;
         autoindex on;

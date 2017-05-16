@@ -51,6 +51,8 @@ iptables -A INPUT -j REJECT --reject-with icmp-proto-unreachable
 ip6tables -A INPUT -p tcp -j REJECT --reject-with tcp-reset
 ip6tables -A INPUT -j REJECT --reject-with icmp6-adm-prohibited
 
+# Allow listing minecraft servers
+ipt -A TCP    -p TCP --dport 80 -j ACCEPT
 # Allow SSH
 ipt -A TCP    -p TCP --dport 22 -j ACCEPT
 # Allow minecraft

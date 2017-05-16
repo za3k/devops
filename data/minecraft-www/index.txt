@@ -1,0 +1,5 @@
+URL                         Server
+----------------------------------------------
+minecraft.za3k.com          Hermitpack
+minecraft.za3k.com:25565    Hermitpack
+minecraft.za3k.com:25566    Better Than Wolves

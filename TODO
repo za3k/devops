@@ -6,7 +6,6 @@
 - Add irc.za3k.com
 - Fix publishing.za3k.com
 - Re-Enable automatic twitter backup and sync to web server
-- Fix avalanche github backup (currently hard disk is full)
 
 - Fix keybase proofs (DNS) for
     - justusemake.com
