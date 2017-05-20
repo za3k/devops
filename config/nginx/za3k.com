@@ -24,7 +24,11 @@ server {
     ssl_certificate /etc/ssl/certs/za3k.com.pem;
     ssl_certificate_key /etc/ssl/private/za3k.com.key;
 
-    add_header Strict-Transport-Security "max-age=315360000"; # HSTS
+    ssl_stapling on;
+    ssl_stapling_verify on;
+    ssl_trusted_certificate /etc/ssl/private/letsencrypt.cer;
+
+    add_header Strict-Transport-Security "max-age=315360000; includeSubDomains"; # HSTS
 
     index index.html index.md;
     root /var/www/za3k;
