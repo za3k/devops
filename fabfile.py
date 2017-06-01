@@ -52,7 +52,7 @@ def corrupt():
         put("config/backup/sshconfig-corrupt", "/root/.ssh/config")
 
         # Set up backup
-        package_ensure(["rsync"])
+        package_ensure(["rsync", "anacron"])
         put("config/backup/generic-backup.sh", "/var/local", mode='0755')
         put("config/backup/backup-exclude-base", "/var/local/backup-exclude", mode='0644')
         put("config/backup/backup-corrupt.sh", "/etc/cron.daily/backup-corrupt", mode='0755')
@@ -91,12 +91,12 @@ def deadtree():
 
     # Set up authorization to back up email to the data server
     public_key = ssh.ensure_key('/var/local/burn-backup', use_sudo=True)
-    with settings(user='deadtree', host_string='burn'):
-        files.append('/home/deadtree/.ssh/authorized_keys', public_key)
+    with settings(user='zachary', host_string='burn'):
+        files.append('/home/deadtree/.ssh/authorized_keys', public_key, use_sudo=True)
     util.put("config/backup/sshconfig-deadtree", "/root/.ssh/config", user='root')
 
     # Set up backup
-    package_ensure(["rsync"])
+    package_ensure(["rsync", "anacron"])
     util.put("config/backup/generic-backup.sh", "/var/local", mode='0755', user='root')
     util.put("config/backup/backup-exclude-base", "/var/local/backup-exclude", mode='0644', user='root')
     util.put("config/backup/backup-deadtree.sh", "/etc/cron.daily/backup-deadtree", mode='0755', user='root')
@@ -257,6 +257,7 @@ def deadtree():
     # .sc
     package_ensure(["sc"])
     # |-- status.za3k.com
+    nginx.ensure_site('config/nginx/status.za3k.com', csr='config/certs/status.za3k.com.csr', key='config/keys/status.za3k.com.key', domain="status.za3k.com", letsencrypt=True, cert="config/certs/status.za3k.com.pem")
     sudo("mkdir -p /var/www/status && chmod 755 /var/www/status")
     util.put("/srv/keys/backup_check", "/var/www/status", user='fcgiwrap', mode='600')
     util.put("/srv/keys/comcast.env", "/etc", user='fcgiwrap', mode='600')
@@ -280,7 +281,7 @@ def equilibrate():
     util.put("config/backup/sshconfig-equilibrate", "/root/.ssh/config", user='root')
 
     # Set up backup
-    package_ensure(["rsync"])
+    package_ensure(["rsync", "anacron"])
     util.put("config/backup/generic-backup.sh", "/var/local", mode='0755', user='root')
     util.put("config/backup/backup-exclude-base", "/var/local/backup-exclude", mode='0644', user='root')
     util.put("config/backup/backup-equilibrate.sh", "/etc/cron.daily/backup-equilibrate", mode='0755', user='root')
@@ -300,7 +301,7 @@ def xenu():
     util.put("config/backup/sshconfig-xenu", "/root/.ssh/config", user='root')
 
     # Set up backup
-    package_ensure(["rsync"])
+    package_ensure(["rsync", "anacron"])
     util.put("config/backup/generic-backup.sh", "/var/local", mode='0755', user='root')
     util.put("config/backup/backup-exclude-xenu", "/var/local/backup-exclude", mode='0644', user='root')
     util.put("config/backup/backup-xenu.sh", "/etc/cron.daily/backup-xenu", mode='0755', user='root')

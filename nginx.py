@@ -9,7 +9,11 @@ import crypto, util
 def ensure():
     """Ensure nginx is installed"""
     select_package("apt")
-    already_installed = package_ensure(["nginx"]) # On debian will automatically be enabled
+    if sudo("which nginx"):
+        # Temporary workaround for manual fix because I don't know how to deal with pinned package to get 'gunzip' and 'gzip' on nginx. Hoping to wait until this is the default.
+        already_installed = True
+    else:
+        already_installed = package_ensure(["nginx"]) # On debian will automatically be enabled
     if not already_installed:
         remove_default_sites()
     ensure_sites_available()

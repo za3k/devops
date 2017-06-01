@@ -7,6 +7,8 @@
 - Fix publishing.za3k.com
 - Re-Enable automatic twitter backup and sync to web server
 
+- Add disk monitoring and statistic reporting. Add comcast to this.
+
 - Fix keybase proofs (DNS) for
     - justusemake.com
     - thinkingtropes.com
