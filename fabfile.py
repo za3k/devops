@@ -199,6 +199,14 @@ def deadtree():
     group_user_ensure('library', 'library')
     with mode_sudo():
         dir_ensure('/var/www/library', mode='755')
+    files.append('/etc/sudoers', 'za3k    ALL=(root) NOPASSWD: /etc/cron.daily/library.sync', use_sudo=True)
+    with settings(user='zachary', host_string='burn'):
+        actual_key = ssh.get_public_key("/data/git/books.git/hooks/deadtree.library")
+    ssh_line = 'command="{command}",no-port-forwarding,no-x11-forwarding,no-agent-forwarding {key}'.format(
+        command="sudo /etc/cron.daily/library.sync",
+        key=actual_key)
+    files.append('/home/za3k/.ssh/authorized_keys', ssh_line, use_sudo=True)
+
     sudo("chown library:library /var/www/library")
     put("config/library/library.sync", "/etc/cron.daily", mode='755', use_sudo=True)
     sudo("/etc/cron.daily/library.sync")
