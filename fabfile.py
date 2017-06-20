@@ -52,7 +52,7 @@ def corrupt():
         put("config/backup/sshconfig-corrupt", "/root/.ssh/config")
 
         # Set up backup
-        package_ensure(["rsync", "anacron"])
+        package_ensure(["rsync"])
         put("config/backup/generic-backup.sh", "/var/local", mode='0755')
         put("config/backup/backup-exclude-base", "/var/local/backup-exclude", mode='0644')
         put("config/backup/backup-corrupt.sh", "/etc/cron.daily/backup-corrupt", mode='0755')
@@ -96,7 +96,7 @@ def deadtree():
     util.put("config/backup/sshconfig-deadtree", "/root/.ssh/config", user='root')
 
     # Set up backup
-    package_ensure(["rsync", "anacron"])
+    package_ensure(["rsync"])
     util.put("config/backup/generic-backup.sh", "/var/local", mode='0755', user='root')
     util.put("config/backup/backup-exclude-base", "/var/local/backup-exclude", mode='0644', user='root')
     util.put("config/backup/backup-deadtree.sh", "/etc/cron.daily/backup-deadtree", mode='0755', user='root')
@@ -178,7 +178,7 @@ def deadtree():
     # gipc daily sync
     # github personal backup
     # github repo list
-    put("config/github/github-metadata.sync", "/etc/cron.daily", mode='755', use_sudo=True)
+    put("config/github/github-metadata-sync", "/etc/cron.daily", mode='755', use_sudo=True)
 
     #                  -> updater
     # irc.za3k.com -> irc
@@ -199,17 +199,17 @@ def deadtree():
     group_user_ensure('library', 'library')
     with mode_sudo():
         dir_ensure('/var/www/library', mode='755')
-    files.append('/etc/sudoers', 'za3k    ALL=(root) NOPASSWD: /etc/cron.daily/library.sync', use_sudo=True)
+    files.append('/etc/sudoers', 'za3k    ALL=(root) NOPASSWD: /etc/cron.daily/library-sync', use_sudo=True)
     with settings(user='zachary', host_string='burn'):
         actual_key = ssh.get_public_key("/data/git/books.git/hooks/deadtree.library")
     ssh_line = 'command="{command}",no-port-forwarding,no-x11-forwarding,no-agent-forwarding {key}'.format(
-        command="sudo /etc/cron.daily/library.sync",
+        command="sudo /etc/cron.daily/library-sync",
         key=actual_key)
     files.append('/home/za3k/.ssh/authorized_keys', ssh_line, use_sudo=True)
 
     sudo("chown library:library /var/www/library")
-    put("config/library/library.sync", "/etc/cron.daily", mode='755', use_sudo=True)
-    sudo("/etc/cron.daily/library.sync")
+    put("config/library/library-sync", "/etc/cron.daily", mode='755', use_sudo=True)
+    sudo("/etc/cron.daily/library-sync")
     nginx.ensure_site('config/nginx/library.za3k.com', csr='config/certs/library.za3k.com.csr', key='config/keys/library.za3k.com.key', domain="library.za3k.com", letsencrypt=True, cert="config/certs/library.za3k.com.pem")
 
     # logs (nginx) and analysis (analog)
@@ -258,8 +258,8 @@ def deadtree():
     ruby.ensure_gems(["redcarpet"])
     # Databases .view
     package_ensure(["sqlite3"])
-    put("config/za3k/za3k-db.sync", "/etc/cron.daily", mode='755', use_sudo=True)
-    sudo("/etc/cron.daily/za3k-db.sync")
+    put("config/za3k/za3k-db-sync", "/etc/cron.daily", mode='755', use_sudo=True)
+    sudo("/etc/cron.daily/za3k-db-sync")
     # colony on the moon
     sudo("rsync -av burn.za3k.com::colony --delete /var/www/colony", user='nobody')
     # .sc
@@ -289,7 +289,7 @@ def equilibrate():
     util.put("config/backup/sshconfig-equilibrate", "/root/.ssh/config", user='root')
 
     # Set up backup
-    package_ensure(["rsync", "anacron"])
+    package_ensure(["rsync"])
     util.put("config/backup/generic-backup.sh", "/var/local", mode='0755', user='root')
     util.put("config/backup/backup-exclude-base", "/var/local/backup-exclude", mode='0644', user='root')
     util.put("config/backup/backup-equilibrate.sh", "/etc/cron.daily/backup-equilibrate", mode='0755', user='root')
@@ -309,7 +309,7 @@ def xenu():
     util.put("config/backup/sshconfig-xenu", "/root/.ssh/config", user='root')
 
     # Set up backup
-    package_ensure(["rsync", "anacron"])
+    package_ensure(["rsync"])
     util.put("config/backup/generic-backup.sh", "/var/local", mode='0755', user='root')
     util.put("config/backup/backup-exclude-xenu", "/var/local/backup-exclude", mode='0644', user='root')
     util.put("config/backup/backup-xenu.sh", "/etc/cron.daily/backup-xenu", mode='0755', user='root')
