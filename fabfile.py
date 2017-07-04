@@ -119,7 +119,8 @@ def deadtree():
 
     # Set up logging reports
     package_ensure(["analog"])
-    dir_ensure("/var/www/logs", mode=755)
+    with mode_sudo():
+        dir_ensure("/var/www/logs", mode=755)
     put("config/logs/generate-logs", "/etc/cron.daily", mode='755', use_sudo=True)
     put("config/logs/analog.cfg", "/etc", mode="644", use_sudo=True)
 
