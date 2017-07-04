@@ -19,7 +19,7 @@ def ensure_git():
     already_installed = package_ensure(["git"])
 
 def ensure_clone(remote, target, user=None, commit=None):
-    if files.exists(target) and  commit is None:
+    if files.exists(target) and commit is None:
         with cd(target):
             runorsuch('git pull', user=user)
     elif files.exists(target) and commit is not None:

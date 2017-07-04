@@ -6,6 +6,7 @@
 - Fix publishing.za3k.com
 - Re-Enable automatic twitter backup and sync to web server
 - Add SNI (alt-names) for za3k.com so www. works right
+- Add letsencrypt and HTTPS for minecraft.za3k.com
 
 - Add disk monitoring and statistic reporting. Add comcast to this.
 

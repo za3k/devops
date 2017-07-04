@@ -47,8 +47,8 @@ def corrupt():
 
         # Set up authorization to back up email to the data server
         public_key = ssh.ensure_key('/var/local/burn-backup')
-        with settings(user='corrupt', host_string='burn'):
-            files.append('/home/corrupt/.ssh/authorized_keys', public_key)
+        with settings(user='zachary', host_string='burn'):
+            files.append('/home/corrupt/.ssh/authorized_keys', public_key, use_sudo=True)
         put("config/backup/sshconfig-corrupt", "/root/.ssh/config")
 
         # Set up backup
@@ -116,6 +116,12 @@ def deadtree():
     #with settings(user='deadtree', host_string='burn'):
     #    #put(public_key, '/home/zachary/test_authorized_keys')
     #    files.append('/home/deadtree/.ssh/authorized_keys', public_key)
+
+    # Set up logging reports
+    package_ensure(["analog"])
+    dir_ensure("/var/www/logs", mode=755)
+    put("config/logs/generate-logs", "/etc/cron.daily", mode='755', use_sudo=True)
+    put("config/logs/analog.cfg", "/etc", mode="644", use_sudo=True)
 
     # ddns.za3k.com (TCP port 80, web updater for DDNS)
     # ns.za3k.com (UDP port 53, DNS server)

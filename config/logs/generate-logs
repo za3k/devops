@@ -1,0 +1,2 @@
+#zcat -f /var/log/nginx/access.log.* | goaccess -p .goaccessrc -e 73.162.6.132 --ignore-crawlers >public_html/goaccess.html
+zcat -f /var/log/nginx/access.log.* | analog +g/etc/analog.cfg 
