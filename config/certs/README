@@ -3,7 +3,10 @@ To generate a key:
 Make sure to keep it private!
 
 To generate a CSR (Certificate Signing Request from a key):
-    openssl req -new -key ${DOMAIN}.key -out ${DOMAIN}.csr -subj "/C=US/ST=/L=/O=/CN=${DOMAIN}" -sha512
+    openssl req -new -key ${DOMAIN}.key -out ${DOMAIN}.csr -subj "/C=US/ST=California/L=Berkeley/O=za3k.com/CN=${DOMAIN}" -sha512
+
+Make a self-signed cert so nginx can boostrap:
+    openssl x509 -req -in ${DOMAIN}.csr -signkey ${DOMAIN}.key -out ${DOMAIN}.pem
 
 The StartSSL certificate will generate a certificate in exchange for a certificate signing request. Then...
 To generate the .pem files in this directory, concatenate
