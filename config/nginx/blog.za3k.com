@@ -22,12 +22,20 @@ server {
     root /var/www/za3k_blog;
       
     # php
+    location /wp-admin {
+        auth_basic "wpadmin";
+        auth_basic_user_file /etc/wp_basic_auth.conf;
+    }
+    location ~ /wp-content.*\.php$ {
+        return 403;
+    }
     location / {
         try_files $uri $uri/ /index.php?$args;
     }
     location ~ \.php$ {
         try_files $uri =404;
         fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        client_max_body_size 28m;
 
         # With php5-fpm:
         fastcgi_pass unix:/var/run/php5-fpm.sock;

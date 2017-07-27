@@ -155,7 +155,18 @@ def deadtree():
     package_ensure(["php5-fpm", "mysql-server", "php5-mysql"])
 
     nginx.ensure_site('config/nginx/blog.za3k.com', cert='config/certs/blog.za3k.com.pem', key='config/keys/blog.za3k.com.key', domain="blog.za3k.com", letsencrypt=True, csr="config/certs/blog.za3k.com.csr")
-    git.ensure_clone_za3k('za3k_blog', '/var/www/za3k_blog', user='fcgiwrap')
+
+    git.ensure_clone_za3k('za3k_blog', '/var/www/za3k_blog', user='www-data')
+    # [Manual] Edit /etc/php5/fpm/php.ini
+    # upload_max_filesize = 20M
+    # post_max_size = 26M
+    # sudo("systemctl reload php5-fpm.service")
+    
+    # Yes, www-data and not fcgiwrap
+    sudo("chown www-data:www-data -R /var/www/za3k_blog")
+    sudo("find . -type d -exec chmod 755 {} \;")
+    sudo("find . -type f -exec chmod 644 {} \;")
+
     # TODO: Replace a database-specific password or make it more obvious it's not used? Currently we're using user ACLs and this gets ignored anyway, I think?
     # [Manual] Load the blog database from backup at /srv/mysql -> /var/lib/mysql
     sudo('systemctl restart mysql')
