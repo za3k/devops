@@ -53,6 +53,9 @@ ip6tables -A INPUT -j REJECT --reject-with icmp6-adm-prohibited
 
 # Allow SSH
 ipt -A TCP    -p TCP --dport 22 -j ACCEPT
+# Allow HTTP
+ipt -A TCP    -p TCP --dport 80 -j ACCEPT
+ipt -A TCP    -p TCP --dport 443 -j ACCEPT
 
 mkdir -p /etc/iptables
 iptables-save >/etc/iptables/iptables.rules

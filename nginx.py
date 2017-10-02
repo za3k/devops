@@ -9,7 +9,7 @@ import crypto, util
 def ensure():
     """Ensure nginx is installed"""
     select_package("apt")
-    if sudo("which nginx"):
+    if sudo("which nginx", warn_only=True):
         # Temporary workaround for manual fix because I don't know how to deal with pinned package to get 'gunzip' and 'gzip' on nginx. Hoping to wait until this is the default.
         already_installed = True
     else:
@@ -35,11 +35,15 @@ def remove_default_sites():
 
 def restart():
     """Restart nginx. Should only be neccesary on ipv[46] switch."""
-    sudo("systemctl restart nginx")
+    if sudo("which systemctl", warn_only=True):
+        sudo("systemctl restart nginx")
+    else:
+        sudo("service nginx restart")
 
 def reload():
     """Reload nginx and apply new configuration"""
-    sudo("systemctl reload nginx")
+    #sudo("systemctl reload nginx")
+    sudo("nginx -s reload")
 
 def ensure_site(config_file, cert=None, csr=None, key=None, letsencrypt=False, domain=None, enabled=True):
     assert not (letsencrypt and not enabled) # Online verification won't work

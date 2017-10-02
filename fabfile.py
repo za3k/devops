@@ -21,6 +21,19 @@ def avalanche():
 
     # github-backup setup is manual. Look on github and at cron entry. Backs up to burn:/data/github
 
+    # Start a webserver
+    already_installed = nginx.ensure()
+    if not already_installed:
+        nginx.restart() # IPv[46] listener only changes on restart
+
+    letsencrypt.ensure()
+
+    # avalanche.za3k.com
+    nginx.ensure_site('config/nginx/avalanche.za3k.com', cert='config/certs/avalanche.za3k.com.pem', key='config/keys/avalanche.za3k.com.key', domain="avalanche.za3k.com", letsencrypt=True, csr="config/certs/avalanche.za3k.com.csr")
+    util.put('data/avalanche/public', '/var/www', 'zachary', mode='755')
+
+    nginx.restart()
+
 def burn():
     """Burn is the backup machine and cannot be configured automatically for safety reasons.
     It runs:

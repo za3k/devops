@@ -19,6 +19,7 @@ server {
     ssl_certificate /etc/ssl/certs/forget.za3k.com.pem;
     ssl_certificate_key /etc/ssl/private/forget.za3k.com.key;
 
+    location /forget-base.img.gz { root /;  }
     location / {
     root /var/www/public;
     index about.html;
