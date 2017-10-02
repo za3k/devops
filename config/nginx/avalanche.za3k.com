@@ -13,7 +13,8 @@ server {
 
 
 server {
-    listen [::]:443 ssl;
+    listen [::]:443 ssl ipv6only=off;
+
     server_name avalanche.za3k.com;
 
     ssl_certificate /etc/ssl/certs/avalanche.za3k.com.pem;

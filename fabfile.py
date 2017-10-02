@@ -90,7 +90,7 @@ def corrupt():
 
         # avalanche.za3k.com
         nginx.ensure_site('config/nginx/corrupt.za3k.com', cert='config/certs/corrupt.za3k.com.pem', key='config/keys/corrupt.za3k.com.key', domain="corrupt.za3k.com", letsencrypt=True, csr="config/certs/corrupt.za3k.com.csr")
-        util.put('data/corrupt/public', '/var/www', 'zachary', mode='755')
+        util.put('data/corrupt/public', '/var/www', 'root', mode='755')
 
         nginx.restart()
 

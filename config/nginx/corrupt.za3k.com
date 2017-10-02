@@ -13,7 +13,7 @@ server {
 
 
 server {
-    listen [::]:443 ssl;
+    listen [::]:443 ssl ipv6only=off;
     server_name corrupt.za3k.com;
 
     ssl_certificate /etc/ssl/certs/corrupt.za3k.com.pem;
