@@ -1,0 +1,21 @@
+Source code: https://github.com/za3k/devops
+Snapshotted daily to burn.za3k.com
+
+         hostname:port  public access? service
+           za3k.com:80  YES            public website
+                        YES            /github : github metadata
+                        YES            /~logs  : server log statistics
+                        YES            /~twitter_archive : archive of some good twitter accounts
+                        YES            /~colony : colony on the moon minecraft modpack
+      blog.za3k.com:80  YES            public blog
+      ddns.za3k.com:80  YES            DDNS backend API for *.moreorcs.com
+  etherpad.za3k.com:80  YES            public etherpad server for real-time collaborative text editing
+   library.za3k.com:80  YES*           personal library hosting
+                        YES            card catalog for printing card inserts
+ nanowrimo.za3k.com:80  YES            short fiction
+        ns.za3k.com:U53 YES            nameserver for *.moreorcs.com
+publishing.za3k.com:80  (down)         PDF->physical book publishing
+    status.za3k.com:80  YES            current status of all services
+         jsfail.com:80  YES            immediate-use tools written in javascript (by freethenation)
+       moreorcs.com:80  YES            public-access receive-only email
+                        YES            public-access subdomain

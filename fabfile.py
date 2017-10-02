@@ -89,7 +89,7 @@ def deadtree():
     sudo("sh /usr/local/bin/deadtree.sh")
     put("config/firewalls/iptables", "/etc/network/if-pre-up.d/", use_sudo=True, mode='0755')
 
-    # Set up authorization to back up email to the data server
+    # Set up authorization to back up to burn
     public_key = ssh.ensure_key('/var/local/burn-backup', use_sudo=True)
     with settings(user='zachary', host_string='burn'):
         files.append('/home/deadtree/.ssh/authorized_keys', public_key, use_sudo=True)
@@ -161,7 +161,7 @@ def deadtree():
     # upload_max_filesize = 20M
     # post_max_size = 26M
     # sudo("systemctl reload php5-fpm.service")
-    
+
     # Yes, www-data and not fcgiwrap
     sudo("chown www-data:www-data -R /var/www/za3k_blog")
     sudo("find . -type d -exec chmod 755 {} \;")
@@ -170,6 +170,10 @@ def deadtree():
     # TODO: Replace a database-specific password or make it more obvious it's not used? Currently we're using user ACLs and this gets ignored anyway, I think?
     # [Manual] Load the blog database from backup at /srv/mysql -> /var/lib/mysql
     sudo('systemctl restart mysql')
+
+    # deadtree.za3k.com
+    nginx.ensure_site('config/nginx/deadtree.za3k.com', cert='config/certs/deadtree.za3k.com.pem', key='config/keys/deadtree.za3k.com.key', domain="deadtree.za3k.com", letsencrypt=True, csr="config/certs/deadtree.za3k.com.csr")
+    util.put('data/deadtree/public', '/var/www', 'zachary', mode='755')
 
     # etherpad.za3k.com
     package_ensure(["sqlite3"])
@@ -302,8 +306,8 @@ def equilibrate():
 
     # Set up authorization to back up email to the data server
     public_key = ssh.ensure_key('/var/local/burn-backup', use_sudo=True)
-    with settings(user='equilibrate', host_string='burn'):
-        files.append('/home/equilibrate/.ssh/authorized_keys', public_key)
+    with settings(user='zachary', host_string='burn'):
+        files.append('/home/equilibrate/.ssh/authorized_keys', public_key, use_sudo=True)
     util.put("config/backup/sshconfig-equilibrate", "/root/.ssh/config", user='root')
 
     # Set up backup
@@ -311,6 +315,40 @@ def equilibrate():
     util.put("config/backup/generic-backup.sh", "/var/local", mode='0755', user='root')
     util.put("config/backup/backup-exclude-base", "/var/local/backup-exclude", mode='0644', user='root')
     util.put("config/backup/backup-equilibrate.sh", "/etc/cron.daily/backup-equilibrate", mode='0755', user='root')
+
+def forget():
+    """Forget does crawls"""
+    # Set up the firewall
+    put("config/firewalls/forget.sh", "/usr/local/bin", use_sudo=True)
+    sudo("sh /usr/local/bin/forget.sh")
+    put("config/firewalls/iptables", "/etc/network/if-pre-up.d/", use_sudo=True, mode='0755')
+
+    # Set up authorization to back up email to the data server
+    public_key = ssh.ensure_key('/var/local/forget-backup', use_sudo=True)
+    with settings(user='zachary', host_string='burn'):
+        files.append('/home/forget/.ssh/authorized_keys', public_key, use_sudo=True)
+    util.put("config/backup/sshconfig-forget", "/root/.ssh/config", user='root')
+
+    # Set up backup
+    package_ensure(["rsync"])
+    util.put("config/backup/generic-backup.sh", "/var/local", mode='0755', user='root')
+    util.put("config/backup/backup-exclude-base", "/var/local/backup-exclude", mode='0644', user='root')
+    util.put("config/backup/backup-forget.sh", "/etc/cron.daily/backup-equilibrate", mode='0755', user='root')
+
+    # Start a webserver
+    already_installed = nginx.ensure()
+    if not already_installed:
+        nginx.restart() # IPv[46] listener only changes on restart
+
+    letsencrypt.ensure()
+
+    # forget.za3k.com
+    nginx.ensure_site('config/nginx/forget.za3k.com', cert='config/certs/forget.za3k.com.pem', key='config/keys/forget.za3k.com.key', domain="forget.za3k.com", letsencrypt=True, csr="config/certs/forget.za3k.com.csr")
+    with mode_sudo():
+        dir_ensure("/var/www/public", mode=755)
+    util.put('data/forget/public', '/var/www', 'zachary', mode='755')
+
+    nginx.restart()
 
 def xenu():
     """Xenu runs minecraft."""
