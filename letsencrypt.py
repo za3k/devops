@@ -13,6 +13,7 @@ def _reload_nginx():
     return "/usr/sbin/nginx -s reload"
 
 def ensure():
+    git.ensure_git()
     # Make sure the user exists
     user_ensure('acme')
     group_ensure('acme')

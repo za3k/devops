@@ -81,6 +81,20 @@ def corrupt():
         # znc.za3k.com
         znc.ensure()
 
+        # Start a webserver
+        already_installed = nginx.ensure()
+        if not already_installed:
+            nginx.restart() # IPv[46] listener only changes on restart
+
+        letsencrypt.ensure()
+
+        # avalanche.za3k.com
+        nginx.ensure_site('config/nginx/corrupt.za3k.com', cert='config/certs/corrupt.za3k.com.pem', key='config/keys/corrupt.za3k.com.key', domain="corrupt.za3k.com", letsencrypt=True, csr="config/certs/corrupt.za3k.com.csr")
+        util.put('data/corrupt/public', '/var/www', 'zachary', mode='755')
+
+        nginx.restart()
+
+
 # fab -H deadtree
 # Run this on Debian 8
 def deadtree():

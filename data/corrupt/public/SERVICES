@@ -1,0 +1,10 @@
+Source code: https://github.com/za3k/devops
+             https://blog.za3k.com/tag/email/
+Snapshotted daily to burn.za3k.com
+
+      hostname:port   public access? service
+  smtp.za3k.com:25    YES            SMTP, email
+  smtp.za3k.com:587 
+  imap.za3k.com:143   NO             IMAP, email
+  imap.za3k.com:4190  NO             ManageSieve, email
+   znc.za3k.com:10000 NO             ZNC, irc bouncer

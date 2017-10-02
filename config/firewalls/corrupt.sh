@@ -56,6 +56,9 @@ ipt -A TCP    -p TCP --dport 22 -j ACCEPT
 # Allow SMTP
 ipt -A TCP    -p TCP --dport 25 -j ACCEPT
 ipt -A TCP    -p TCP --dport 587 -j ACCEPT
+# Allow HTTP
+ipt -A TCP    -p TCP --dport 80 -j ACCEPT
+ipt -A TCP    -p TCP --dport 443 -j ACCEPT
 # Allow IMAP
 ipt -A TCP    -p TCP --dport 143 -j ACCEPT
 # Allow ManageSieve
