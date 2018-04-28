@@ -1,3 +1,3 @@
 #!/bin/sh
-/var/local/generic-backup.sh burn-backup:/data/archive/forget.latest
-ssh burn-backup sudo /var/local/forget.snapshot
+/var/local/generic-backup.sh germinate-backup:/data/snapshots.daily/forget
+ssh germinate-backup sudo /var/local/snapshot forget

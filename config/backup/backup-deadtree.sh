@@ -1,3 +1,3 @@
 #!/bin/sh
-/var/local/generic-backup.sh burn-backup:/data/archive/deadtree.latest
-ssh burn-backup sudo /var/local/deadtree.snapshot
+/var/local/generic-backup.sh germinate-backup:/data/snapshots.daily/deadtree
+ssh germinate-backup sudo /var/local/snapshot deadtree

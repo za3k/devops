@@ -1,2 +1,2 @@
 #!/bin/sh
-rsync -avr burn.za3k.com::github-metadata/ /var/www/github --delete
+rsync -avr germinate.za3k.com::github-metadata/ /var/www/github --delete

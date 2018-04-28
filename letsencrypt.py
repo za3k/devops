@@ -38,6 +38,6 @@ def add_csr(path, domain):
         with settings(warn_only=True):
             sudo(".acme.sh/acme.sh --signcsr --csr {path} -w {well_known}".format(path=path, well_known=well_known), user='acme')
         sudo("chown acme:acme /etc/ssl/certs/{domain}.pem".format(domain=domain))
-        sudo(".acme.sh/acme.sh --installcert -d {domain} --certpath /etc/ssl/certs/{domain}.letsencrypt.pem --fullchainpath /etc/ssl/certs/{domain}.pem --renew-hook '{reload_nginx}'".format(path=path, domain=domain, reload_nginx=_reload_nginx()), user='acme')
+        sudo(".acme.sh/acme.sh --installcert -d {domain} --certpath /etc/ssl/certs/{domain}.letsencrypt.pem --fullchainpath /etc/ssl/certs/{domain}.pem --renew-hook 'sudo {reload_nginx}'".format(path=path, domain=domain, reload_nginx=_reload_nginx()), user='acme')
         #sudo("cat /etc/ssl/certs/{domain}.letsencrypt.pem /etc/ssl/certs/lets-encrypt-x3-cross-signed.pem >/etc/ssl/certs/{domain}.pem".format(path=path, domain=domain), user='acme')
     return '/etc/ssl/certs/{domain}.key'.format(domain=domain)

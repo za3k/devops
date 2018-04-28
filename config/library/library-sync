@@ -1,3 +1,3 @@
 #!/bin/sh
-sudo -u library rsync -a burn.za3k.com::library --delete /var/www/library
+sudo -u library rsync -a germinate.za3k.com::library --delete /var/www/library
 sudo -u library find /var/www/library -type f -printf "%P\n" >/var/www/library/index.txt

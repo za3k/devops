@@ -8,6 +8,7 @@
 - Add SNI (alt-names) for za3k.com so www. works right
 - Add CAA for za3k.com, etc
 - Add letsencrypt and HTTPS for minecraft.za3k.com
+- Monitor energy usage: https://pge.opower.com/ei/x/energy-usage-details#!wdb/usage/electricity/day/2017-10-04?accountUuid=<redacted>
 
 - Add disk monitoring and statistic reporting. Add comcast to this.
 

@@ -19,7 +19,7 @@ def avalanche():
     sudo("sh /usr/local/bin/avalanche.sh")
     put("config/firewalls/iptables", "/etc/network/if-pre-up.d/", use_sudo=True, mode='0755')
 
-    # github-backup setup is manual. Look on github and at cron entry. Backs up to burn:/data/github
+    # github-backup setup is manual. Look on github and at cron entry. Backs up to germinate:/data/github
 
     # Start a webserver
     already_installed = nginx.ensure()
@@ -40,6 +40,7 @@ def burn():
         git.za3k.com: HTTPS access for cloning
         burn.za3k.com: SCP access for backups and git commits
                        rsync access for backups and public data
+        graph.za3k.com: graphs
     """
     # Daily
     #    * rsync -rltp "$@" --delete --chmod=D755,F644 /data/archive/tarragon.latest/home/zachary/books/ /data/books
@@ -59,8 +60,8 @@ def corrupt():
         put("config/firewalls/iptables", "/etc/network/if-pre-up.d/", use_sudo=True, mode='0755')
 
         # Set up authorization to back up email to the data server
-        public_key = ssh.ensure_key('/var/local/burn-backup')
-        with settings(user='zachary', host_string='burn'):
+        public_key = ssh.ensure_key('/var/local/germinate-backup')
+        with settings(user='zachary', host_string='germinate'):
             files.append('/home/corrupt/.ssh/authorized_keys', public_key, use_sudo=True)
         put("config/backup/sshconfig-corrupt", "/root/.ssh/config")
 
@@ -88,8 +89,10 @@ def corrupt():
 
         letsencrypt.ensure()
 
-        # avalanche.za3k.com
+        # corrupt.za3k.com
         nginx.ensure_site('config/nginx/corrupt.za3k.com', cert='config/certs/corrupt.za3k.com.pem', key='config/keys/corrupt.za3k.com.key', domain="corrupt.za3k.com", letsencrypt=True, csr="config/certs/corrupt.za3k.com.csr")
+        nginx.ensure_site('config/nginx/imap.za3k.com', cert='config/certs/imap.za3k.com.pem', key='config/keys/imap.za3k.com.key', domain="imap.za3k.com", letsencrypt=True, csr="config/certs/imap.za3k.com.csr")
+        nginx.ensure_site('config/nginx/smtp.za3k.com', cert='config/certs/smtp.za3k.com.pem', key='config/keys/smtp.za3k.com.key', domain="smtp.za3k.com", letsencrypt=True, csr="config/certs/smtp.za3k.com.csr")
         util.put('data/corrupt/public', '/var/www', 'root', mode='755')
 
         nginx.restart()
@@ -116,9 +119,9 @@ def deadtree():
     sudo("sh /usr/local/bin/deadtree.sh")
     put("config/firewalls/iptables", "/etc/network/if-pre-up.d/", use_sudo=True, mode='0755')
 
-    # Set up authorization to back up to burn
-    public_key = ssh.ensure_key('/var/local/burn-backup', use_sudo=True)
-    with settings(user='zachary', host_string='burn'):
+    # Set up authorization to back up to germinate
+    public_key = ssh.ensure_key('/var/local/germinate-backup', use_sudo=True)
+    with settings(user='zachary', host_string='germinate'):
         files.append('/home/deadtree/.ssh/authorized_keys', public_key, use_sudo=True)
     util.put("config/backup/sshconfig-deadtree", "/root/.ssh/config", user='root')
 
@@ -140,7 +143,7 @@ def deadtree():
 
     # Set up authorization to back up to the data server
     #public_key = ssh.ensure_key('/root/.ssh/id_rsa')
-    #with settings(user='deadtree', host_string='burn'):
+    #with settings(user='deadtree', host_string='germinate'):
     #    #put(public_key, '/home/zachary/test_authorized_keys')
     #    files.append('/home/deadtree/.ssh/authorized_keys', public_key)
 
@@ -215,7 +218,7 @@ def deadtree():
         sudo("mkdir -p /var/www/etherpad/var", user='etherpad')
         with cd("/var/www/etherpad"):
             sudo("npm install sqlite3")
-        sudo("rsync -av burn.za3k.com::etherpad --delete /var/www/etherpad/var", user='etherpad')
+        sudo("rsync -av germinate.za3k.com::etherpad --delete /var/www/etherpad/var", user='etherpad')
     supervisord.ensure()
     supervisord.ensure_config("config/supervisor/etherpad.conf")
     supervisord.update()
@@ -249,7 +252,7 @@ def deadtree():
     with mode_sudo():
         dir_ensure('/var/www/library', mode='755')
     files.append('/etc/sudoers', 'za3k    ALL=(root) NOPASSWD: /etc/cron.daily/library-sync', use_sudo=True)
-    with settings(user='zachary', host_string='burn'):
+    with settings(user='zachary', host_string='germinate'):
         actual_key = ssh.get_public_key("/data/git/books.git/hooks/deadtree.library")
     ssh_line = 'command="{command}",no-port-forwarding,no-x11-forwarding,no-agent-forwarding {key}'.format(
         command="sudo /etc/cron.daily/library-sync",
@@ -295,7 +298,7 @@ def deadtree():
     group_user_ensure('za3k', 'za3k')
     nginx.ensure_site('config/nginx/za3k.com', cert='config/certs/za3k.com.pem', key='config/keys/za3k.com.key', domain="za3k.com", letsencrypt=True, csr="config/certs/za3k.com.csr")
     git.ensure_clone_za3k('za3k', '/var/www/za3k', user='za3k')
-    with settings(user='zachary', host_string='burn'):
+    with settings(user='zachary', host_string='germinate'):
         actual_key = ssh.get_public_key("/data/git/za3k.git/hooks/deadtree_key")
     ssh_line = 'command="{command}",no-port-forwarding,no-x11-forwarding,no-agent-forwarding {key}'.format(
         command="/usr/bin/git -C /var/www/za3k pull",
@@ -310,7 +313,7 @@ def deadtree():
     put("config/za3k/za3k-db-sync", "/etc/cron.daily", mode='755', use_sudo=True)
     sudo("/etc/cron.daily/za3k-db-sync")
     # colony on the moon
-    sudo("rsync -av burn.za3k.com::colony --delete /var/www/colony", user='nobody')
+    sudo("rsync -av germinate.za3k.com::colony --delete /var/www/colony", user='nobody')
     # .sc
     package_ensure(["sc"])
     # |-- status.za3k.com
@@ -332,8 +335,8 @@ def equilibrate():
     put("config/firewalls/iptables", "/etc/network/if-pre-up.d/", use_sudo=True, mode='0755')
 
     # Set up authorization to back up email to the data server
-    public_key = ssh.ensure_key('/var/local/burn-backup', use_sudo=True)
-    with settings(user='zachary', host_string='burn'):
+    public_key = ssh.ensure_key('/var/local/germinate-backup', use_sudo=True)
+    with settings(user='zachary', host_string='germinate'):
         files.append('/home/equilibrate/.ssh/authorized_keys', public_key, use_sudo=True)
     util.put("config/backup/sshconfig-equilibrate", "/root/.ssh/config", user='root')
 
@@ -352,7 +355,7 @@ def forget():
 
     # Set up authorization to back up email to the data server
     public_key = ssh.ensure_key('/var/local/forget-backup', use_sudo=True)
-    with settings(user='zachary', host_string='burn'):
+    with settings(user='zachary', host_string='germinate'):
         files.append('/home/forget/.ssh/authorized_keys', public_key, use_sudo=True)
     util.put("config/backup/sshconfig-forget", "/root/.ssh/config", user='root')
 
@@ -375,6 +378,8 @@ def forget():
         dir_ensure("/var/www/public", mode=755)
     util.put('data/forget/public', '/var/www', 'zachary', mode='755')
 
+    # logging
+
     nginx.restart()
 
 def xenu():
@@ -385,8 +390,8 @@ def xenu():
     put("config/firewalls/iptables", "/etc/network/if-pre-up.d/", use_sudo=True, mode='0755')
 
     # Set up authorization to back up
-    public_key = ssh.ensure_key('/var/local/burn-backup', use_sudo=True)
-    with settings(user='xenu-linux', host_string='burn'):
+    public_key = ssh.ensure_key('/var/local/germinate-backup', use_sudo=True)
+    with settings(user='xenu-linux', host_string='germinate'):
         files.append('/home/xenu-linux/.ssh/authorized_keys', public_key)
     sudo("mkdir -p /root/.ssh")
     util.put("config/backup/sshconfig-xenu", "/root/.ssh/config", user='root')

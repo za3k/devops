@@ -1,4 +1,4 @@
-Host burn-backup
-    Hostname burn.za3k.com
-    IdentityFile /var/local/burn-backup
+Host germinate-backup
+    Hostname germinate.za3k.com
+    IdentityFile /var/local/germinate-backup
     User corrupt

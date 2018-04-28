@@ -1,3 +1,3 @@
 #!/bin/sh
-/var/local/generic-backup.sh burn-backup:/data/archive/corrupt.latest
-ssh burn-backup sudo /var/local/corrupt.snapshot
+/var/local/generic-backup.sh germinate-backup:/data/snapshots.daily/corrupt
+ssh germinate-backup sudo /var/local/snapshot corrupt
