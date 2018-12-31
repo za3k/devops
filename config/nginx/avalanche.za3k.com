@@ -28,7 +28,7 @@ server {
         autoindex     on;
     }
     location /pub {
-        root /public;
+        alias /public;
         index about.html;
         default_type text/plain;
         add_header  X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";

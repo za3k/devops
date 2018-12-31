@@ -26,4 +26,13 @@ server {
         add_header  X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
         autoindex     on;
     }
+
+    location /email {
+        auth_basic "http email";
+        auth_basic_user_file "conf.d/corrupt.htaccess";
+        alias /var/spool/mail/vmail/za3k@za3k.com;
+        default_type text/plain;
+        add_header  X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
+        autoindex     on;
+    }
 }

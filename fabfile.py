@@ -90,10 +90,18 @@ def corrupt():
         letsencrypt.ensure()
 
         # corrupt.za3k.com
+        util.put('config/keys/basic_auth/corrupt.htaccess', '/etc/nginx/conf.d', 'www-data', mode='700')
         nginx.ensure_site('config/nginx/corrupt.za3k.com', cert='config/certs/corrupt.za3k.com.pem', key='config/keys/corrupt.za3k.com.key', domain="corrupt.za3k.com", letsencrypt=True, csr="config/certs/corrupt.za3k.com.csr")
         nginx.ensure_site('config/nginx/imap.za3k.com', cert='config/certs/imap.za3k.com.pem', key='config/keys/imap.za3k.com.key', domain="imap.za3k.com", letsencrypt=True, csr="config/certs/imap.za3k.com.csr")
         nginx.ensure_site('config/nginx/smtp.za3k.com', cert='config/certs/smtp.za3k.com.pem', key='config/keys/smtp.za3k.com.key', domain="smtp.za3k.com", letsencrypt=True, csr="config/certs/smtp.za3k.com.csr")
         util.put('data/corrupt/public', '/var/www', 'root', mode='755')
+
+        # webmail.za3k.com
+        package_ensure(["php", "php-pear", "php-mbstring", "php-sqlite3", "php-gd", "php-imagick", "php-intl", "php-ldap"])
+        # By hand: edit php.ini to use the time zone you want
+        nginx.ensure_site('config/nginx/webmail.za3k.com', cert='config/certs/webmail.za3k.com.pem', key='config/keys/webmail.za3k.com.key', domain="webmail.za3k.com", letsencrypt=True, csr="config/certs/webmail.za3k.com.csr")
+        # By hand: install /var/www/roundcube from a tar. chown it to www-data. set it up and delete installer--copy config file from config directory. Edit autologon to include user+pw
+        # By hand: touch /var/www/roundcube.db and make it writable
 
         nginx.restart()
 
