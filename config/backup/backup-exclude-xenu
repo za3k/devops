@@ -2,7 +2,8 @@
 # is specified with --exclude-from
 # We always specify --one-file-system as well.
 - /lost+found
-- /var/log
++ /var/log/forever
+- /var/log/*
 - /var/tmp
 - /var/lib
 - /swapfile

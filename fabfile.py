@@ -6,7 +6,7 @@ from fabric.api import run, env, sudo, put, get, cd, settings, hosts
 from fabric.contrib import files
 from cuisine import dir_ensure, dir_exists, group_ensure, group_user_ensure, mode_sudo, package_ensure, user_ensure
 from StringIO import StringIO
-import apt, git, letsencrypt, mx, nginx, node, path, ruby, ssh, supervisord, util, znc
+import apt, git, letsencrypt, logs, mx, nginx, node, path, ruby, ssh, supervisord, util, znc
 
 env.shell = '/bin/sh -c'
 env.use_ssh_config = True
@@ -14,11 +14,25 @@ env.use_ssh_config = True
 def avalanche():
     """Avalanche doesn't really run anything except the printserver, it's a point of presence."""
 
+    # Set up logging
+    logs.setup()
+
     # Set up the firewall
     put("config/firewalls/avalanche.sh", "/usr/local/bin", use_sudo=True)
     sudo("sh /usr/local/bin/avalanche.sh")
     put("config/firewalls/iptables", "/etc/network/if-pre-up.d/", use_sudo=True, mode='0755')
 
+    # Set up authorization to back up to germinate
+    public_key = ssh.ensure_key('/var/local/germinate-backup', use_sudo=True)
+    with settings(user='zachary', host_string='germinate'):
+        files.append('/home/avalanche/.ssh/authorized_keys', public_key, use_sudo=True)
+    util.put("config/backup/sshconfig-avalanche", "/root/.ssh/config", user='root')
+
+    # Set up backup
+    package_ensure(["rsync"])
+    util.put("config/backup/generic-backup.sh", "/var/local", mode='0755', user='root')
+    util.put("config/backup/backup-exclude-avalanche", "/var/local/backup-exclude", mode='0644', user='root')
+    util.put("config/backup/backup-avalanche.sh", "/etc/cron.daily/backup-avalanche", mode='0755', user='root')
     # github-backup setup is manual. Look on github and at cron entry. Backs up to germinate:/data/github
 
     # Start a webserver
@@ -122,6 +136,9 @@ def deadtree():
     group_user_ensure('nobody', 'nobody')
     sudo('usermod -s /bin/false nobody')
 
+    # Set up logging
+    logs.setup()
+
     # Set up the firewall
     put("config/firewalls/deadtree.sh", "/usr/local/bin", use_sudo=True)
     sudo("sh /usr/local/bin/deadtree.sh")
@@ -148,12 +165,6 @@ def deadtree():
 
     # Set up letsencrypt
     letsencrypt.ensure() 
-
-    # Set up authorization to back up to the data server
-    #public_key = ssh.ensure_key('/root/.ssh/id_rsa')
-    #with settings(user='deadtree', host_string='germinate'):
-    #    #put(public_key, '/home/zachary/test_authorized_keys')
-    #    files.append('/home/deadtree/.ssh/authorized_keys', public_key)
 
     # Set up logging reports
     package_ensure(["analog"])

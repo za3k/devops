@@ -8,5 +8,8 @@
 - /var/lib
 - /swapfile
 - /tmp
+- /home/zachary/github-backup/data
+- /home/mc
+- /home/fenn
 # Just to make sure this list and the backup programs are included no matter how badly we screw up
 + /var/local/*
