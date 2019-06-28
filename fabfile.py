@@ -73,6 +73,9 @@ def corrupt():
         run("sh /usr/local/bin/corrupt.sh")
         put("config/firewalls/iptables", "/etc/network/if-pre-up.d/", use_sudo=True, mode='0755')
 
+        # Set up logging
+        logs.setup()
+
         # Set up authorization to back up email to the data server
         public_key = ssh.ensure_key('/var/local/germinate-backup')
         with settings(user='zachary', host_string='germinate'):
@@ -408,10 +411,13 @@ def xenu():
     sudo("sh /usr/local/bin/xenu.sh")
     put("config/firewalls/iptables", "/etc/network/if-pre-up.d/", use_sudo=True, mode='0755')
 
+    # Set up logging
+    logs.setup()
+
     # Set up authorization to back up
     public_key = ssh.ensure_key('/var/local/germinate-backup', use_sudo=True)
-    with settings(user='xenu-linux', host_string='germinate'):
-        files.append('/home/xenu-linux/.ssh/authorized_keys', public_key)
+    with settings(user='zachary', host_string='germinate'):
+        files.append('/home/xenu-linux/.ssh/authorized_keys', public_key, use_sudo=True)
     sudo("mkdir -p /root/.ssh")
     util.put("config/backup/sshconfig-xenu", "/root/.ssh/config", user='root')
 

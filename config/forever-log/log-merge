@@ -1,0 +1,77 @@
+#!/bin/bash
+usage() {
+  echo "Usage: log-merge [-o OUTFILE [-i]] IN..." >&2
+  echo "  If the file OUTFILE already exists and -i is passed, it is updated only if the contents have changed" >&2
+}
+
+log_merge() {
+  #sort -m -u "$@" # Dangerous because it assumes inputs are already sorted
+  sort -u "$@"
+}
+
+# Argument parsing
+POSITIONAL=()
+# Flags
+INPLACE=N
+unset OUTFILE
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -h|--help) # help
+      usage
+      exit 0
+      ;;
+    -o|--outfile)
+      OUTFILE=$2
+      [ $# -ge 2 ] || {
+        echo "Error: --outfile|-o option expects a file as the next argument" >&2
+        usage
+        exit 1
+      }
+      shift 2
+      ;;
+    -i|--in-place)
+      INPLACE=Y
+      shift
+      ;;
+    --) # end argument parsing
+      shift
+      break
+      ;;
+    -*|--*) # unsupported flags
+      echo "Error: Unsupported flag $1" >&2
+      usage
+      exit 1
+      ;;
+    *)
+      POSITIONAL+=("$1")
+      shift
+      ;;
+  esac
+done
+if [ -e "${OUTFILE}" ]; then
+  POSITIONAL+=("$OUTFILE")
+fi
+set -- "${POSITIONAL[@]}"
+
+if [ -n "$OUTFILE" ]; then
+  if [ "$INPLACE" = "N" ]; then
+    log_merge "$@" >"${OUTFILE}"
+  else
+    TEMPFILE=`mktemp`
+    log_merge "$@" >"${TEMPFILE}"
+    if cmp -s "${OUTFILE}" "${TEMPFILE}"; then
+      # Files are the same -- no change
+      exit 0
+    else
+      # Files are not the same -- make a change
+      chown --reference="${OUTFILE}" "${TEMPFILE}" || exit 2
+      chmod --reference="${OUTFILE}" "${TEMPFILE}" || exit 2
+      #touch -r "${OUTFILE}" "${TEMPFILE}" # TODO: Use one of the source files as the source time?
+      # Lose xattrs, this is ok for the cost of atomic replace
+      mv -f "${TEMPFILE}" "${OUTFILE}"
+    fi
+  fi
+else
+  log_merge "$@"
+fi
