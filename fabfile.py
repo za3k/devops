@@ -2,7 +2,7 @@ from __future__ import print_function
 import sys
 sys.dont_write_bytecode = True
 
-from fabric.api import run, env, sudo, put, get, cd, settings, hosts
+from fabric.api import run, env, sudo, cd, settings
 from fabric.contrib import files
 from cuisine import dir_ensure, dir_exists, group_ensure, group_user_ensure, mode_sudo, package_ensure, user_ensure
 from StringIO import StringIO
@@ -18,25 +18,27 @@ def avalanche():
     logs.setup()
 
     # Set up the firewall
-    put("config/firewalls/avalanche.sh", "/usr/local/bin", use_sudo=True)
+    util.put_file("config/firewalls/avalanche.sh", "/usr/local/bin/avalanche.sh", mode='755', user='root')
     sudo("sh /usr/local/bin/avalanche.sh")
-    put("config/firewalls/iptables", "/etc/network/if-pre-up.d/", use_sudo=True, mode='0755')
+    util.put_file("config/firewalls/iptables", "/etc/network/if-pre-up.d/ip_tables", mode='755', user='root')
+    util.put_file("config/backup/backup-avalanche.sh", "/etc/cron.daily/backup-avalanche", mode='755', user='root')
 
     # Set up authorization to back up to germinate
     public_key = ssh.ensure_key('/var/local/germinate-backup', use_sudo=True)
     with settings(user='zachary', host_string='germinate'):
         files.append('/home/avalanche/.ssh/authorized_keys', public_key, use_sudo=True)
-    util.put("config/backup/sshconfig-avalanche", "/root/.ssh/config", user='root')
+    util.put_file("config/backup/sshconfig-avalanche", "/root/.ssh/config", user='root')
 
     # Set up backup
     package_ensure(["rsync"])
-    util.put("config/backup/generic-backup.sh", "/var/local", mode='0755', user='root')
-    util.put("config/backup/backup-exclude-avalanche", "/var/local/backup-exclude", mode='0644', user='root')
-    util.put("config/backup/backup-avalanche.sh", "/etc/cron.daily/backup-avalanche", mode='0755', user='root')
+    util.put_file("config/backup/generic-backup.sh", "/var/local/generic-backup.sh", mode='755', user='root')
+    util.put_file("config/backup/backup-exclude-avalanche", "/var/local/backup-exclude", mode='644', user='root')
+    util.put_file("config/backup/backup-avalanche.sh", "/etc/cron.daily/backup-avalanche", mode='755', user='root')
     # github-backup setup is manual. Look on github and at cron entry. Backs up to germinate:/data/github
 
     # Start a webserver
     already_installed = nginx.ensure()
+    nginx.remove_default_sites()
     if not already_installed:
         nginx.restart() # IPv[46] listener only changes on restart
 
@@ -44,24 +46,9 @@ def avalanche():
 
     # avalanche.za3k.com
     nginx.ensure_site('config/nginx/avalanche.za3k.com', cert='config/certs/avalanche.za3k.com.pem', key='config/keys/avalanche.za3k.com.key', domain="avalanche.za3k.com", letsencrypt=True, csr="config/certs/avalanche.za3k.com.csr")
-    util.put('data/avalanche/public', '/var/www', 'zachary', mode='755')
+    util.put_dir('data/avalanche/public', '/var/www/public', mode='755', user='zachary')
 
     nginx.restart()
-
-def burn():
-    """Burn is the backup machine and cannot be configured automatically for safety reasons.
-    It runs:
-        git.za3k.com: HTTPS access for cloning
-        burn.za3k.com: SCP access for backups and git commits
-                       rsync access for backups and public data
-        graph.za3k.com: graphs
-    """
-    # Daily
-    #    * rsync -rltp "$@" --delete --chmod=D755,F644 /data/archive/tarragon.latest/home/zachary/books/ /data/books
-    #    * rsync -rltp "$@" --delete --chmod=D755,F644 /data/archive/tarragon.latest/srv/za3k-db/ /data/dbs/za3k-db
-    # gmail backup
-    # letsencrypt for git.za3k.com cert
-    pass
 
 # fab -H corrupt corrupt
 # Run this on Debian 8
@@ -69,9 +56,9 @@ def corrupt():
     apt.sudo_ensure() # cuisine.package_ensure is broken otherwise
     with cd("/"): # Hack because /root is -x
         # Set up the firewall
-        put("config/firewalls/corrupt.sh", "/usr/local/bin")
+        util.put_file("config/firewalls/corrupt.sh", "/usr/local/bin/corrupt.sh", mode='755', user='root')
         run("sh /usr/local/bin/corrupt.sh")
-        put("config/firewalls/iptables", "/etc/network/if-pre-up.d/", use_sudo=True, mode='0755')
+        util.put_file("config/firewalls/iptables", "/etc/network/if-pre-up.d/iptables", mode='755', user='root')
 
         # Set up logging
         logs.setup()
@@ -80,13 +67,13 @@ def corrupt():
         public_key = ssh.ensure_key('/var/local/germinate-backup')
         with settings(user='zachary', host_string='germinate'):
             files.append('/home/corrupt/.ssh/authorized_keys', public_key, use_sudo=True)
-        put("config/backup/sshconfig-corrupt", "/root/.ssh/config")
+        util.put_file("config/backup/sshconfig-corrupt", "/root/.ssh/config", mode='600', user='root')
 
         # Set up backup
         package_ensure(["rsync"])
-        put("config/backup/generic-backup.sh", "/var/local", mode='0755')
-        put("config/backup/backup-exclude-base", "/var/local/backup-exclude", mode='0644')
-        put("config/backup/backup-corrupt.sh", "/etc/cron.daily/backup-corrupt", mode='0755')
+        util.put_file("config/backup/generic-backup.sh", "/var/local/generic-backup.sh", mode='755', user='root')
+        util.put_file("config/backup/backup-exclude-base", "/var/local/backup-exclude", mode='644', user='root')
+        util.put_file("config/backup/backup-corrupt.sh", "/etc/cron.daily/backup-corrupt", mode='755', user='root')
 
         # Set up postgres, postfix, dovecot, spamassassin
         mx.ensure(restore=True)
@@ -107,11 +94,11 @@ def corrupt():
         letsencrypt.ensure()
 
         # corrupt.za3k.com
-        util.put('config/keys/basic_auth/corrupt.htaccess', '/etc/nginx/conf.d', 'www-data', mode='700')
+        util.put_file('config/keys/basic_auth/corrupt.htaccess', '/etc/nginx/conf.d/corrupt.htaccess', mode='700', user='www-data')
         nginx.ensure_site('config/nginx/corrupt.za3k.com', cert='config/certs/corrupt.za3k.com.pem', key='config/keys/corrupt.za3k.com.key', domain="corrupt.za3k.com", letsencrypt=True, csr="config/certs/corrupt.za3k.com.csr")
         nginx.ensure_site('config/nginx/imap.za3k.com', cert='config/certs/imap.za3k.com.pem', key='config/keys/imap.za3k.com.key', domain="imap.za3k.com", letsencrypt=True, csr="config/certs/imap.za3k.com.csr")
         nginx.ensure_site('config/nginx/smtp.za3k.com', cert='config/certs/smtp.za3k.com.pem', key='config/keys/smtp.za3k.com.key', domain="smtp.za3k.com", letsencrypt=True, csr="config/certs/smtp.za3k.com.csr")
-        util.put('data/corrupt/public', '/var/www', 'root', mode='755')
+        util.put_dir('data/corrupt/public', '/var/www/public', 'root', mode='755')
 
         # webmail.za3k.com
         package_ensure(["php", "php-pear", "php-mbstring", "php-sqlite3", "php-gd", "php-imagick", "php-intl", "php-ldap"])
@@ -143,21 +130,21 @@ def deadtree():
     logs.setup()
 
     # Set up the firewall
-    put("config/firewalls/deadtree.sh", "/usr/local/bin", use_sudo=True)
+    util.put_file("config/firewalls/deadtree.sh", "/usr/local/bin/deadtree.sh", mode='755', user='root')
     sudo("sh /usr/local/bin/deadtree.sh")
-    put("config/firewalls/iptables", "/etc/network/if-pre-up.d/", use_sudo=True, mode='0755')
+    util.put_file("config/firewalls/iptables", "/etc/network/if-pre-up.d/", mode='755', user='root')
 
     # Set up authorization to back up to germinate
     public_key = ssh.ensure_key('/var/local/germinate-backup', use_sudo=True)
     with settings(user='zachary', host_string='germinate'):
         files.append('/home/deadtree/.ssh/authorized_keys', public_key, use_sudo=True)
-    util.put("config/backup/sshconfig-deadtree", "/root/.ssh/config", user='root')
+    util.put_file("config/backup/sshconfig-deadtree", "/root/.ssh/config", user='root')
 
     # Set up backup
     package_ensure(["rsync"])
-    util.put("config/backup/generic-backup.sh", "/var/local", mode='0755', user='root')
-    util.put("config/backup/backup-exclude-base", "/var/local/backup-exclude", mode='0644', user='root')
-    util.put("config/backup/backup-deadtree.sh", "/etc/cron.daily/backup-deadtree", mode='0755', user='root')
+    util.put_file("config/backup/generic-backup.sh", "/var/local", mode='755', user='root')
+    util.put_file("config/backup/backup-exclude-base", "/var/local/backup-exclude", mode='644', user='root')
+    util.put_file("config/backup/backup-deadtree.sh", "/etc/cron.daily/backup-deadtree", mode='755', user='root')
 
     # Set up nginx
     already_installed = nginx.ensure()
@@ -172,9 +159,9 @@ def deadtree():
     # Set up logging reports
     package_ensure(["analog"])
     with mode_sudo():
-        dir_ensure("/var/www/logs", mode=755)
-    put("config/logs/generate-logs", "/etc/cron.daily", mode='755', use_sudo=True)
-    put("config/logs/analog.cfg", "/etc", mode="644", use_sudo=True)
+        dir_ensure("/var/www/logs", mode='755')
+    util.put_file("config/logs/generate-logs", "/etc/cron.daily/generate-logs", mode='755', user='root')
+    util.put_file("config/logs/analog.cfg", "/etc/analog.cfg", mode='644', user='root')
 
     # ddns.za3k.com (TCP port 80, web updater for DDNS)
     # ns.za3k.com (UDP port 53, DNS server)
@@ -188,17 +175,16 @@ def deadtree():
     with cd("/var/lib/nsd"):
         sudo("touch /var/lib/nsd/moreorcs.com.zone && chown nsd:nsd /var/lib/nsd/moreorcs.com.zone")
     node.ensure()
-    put("config/ddns/moreorcs.com.zonetemplate", "/etc/nsd", mode='644', use_sudo=True)
+    util.put_file("config/ddns/moreorcs.com.zonetemplate", "/etc/nsd/moreorcs.com.zonetemplate", mode='644', user='root')
     supervisord.ensure()
     git.ensure_clone_github('thingless/ddns', '/var/lib/nsd/ddns', user='nsd')
     supervisord.ensure_config("config/supervisor/ddns.conf")
-    put("config/ddns/config.json", "/var/lib/nsd", mode='644', use_sudo=True)
-    sudo("chown nsd:nsd /var/lib/nsd/config.json")
+    util.put_file("config/ddns/config.json", "/var/lib/nsd/config.json", mode='644', user='nsd')
     # [Manual] Copy dnsDB.json from backup
     sudo("cd /var/lib/nsd && ln -sf ddns/index.txt index.txt && chown nsd:nsd index.txt")
     supervisord.update() # Run ddns
     package_ensure(["nsd"])
-    put("config/ddns/nsd.conf", "/etc/nsd", mode='644', use_sudo=True)
+    util.put_file("config/ddns/nsd.conf", "/etc/nsd/nsd.conf", mode='644', user='root')
     sudo("systemctl restart nsd")
     nginx.ensure_site('config/nginx/ddns.za3k.com', csr='config/certs/ddns.za3k.com.csr', key='config/keys/ddns.za3k.com.key', domain="ddns.za3k.com", letsencrypt=True, cert="config/certs/ddns.za3k.com.pem")
     nginx.reload()
@@ -225,7 +211,7 @@ def deadtree():
 
     # deadtree.za3k.com
     nginx.ensure_site('config/nginx/deadtree.za3k.com', cert='config/certs/deadtree.za3k.com.pem', key='config/keys/deadtree.za3k.com.key', domain="deadtree.za3k.com", letsencrypt=True, csr="config/certs/deadtree.za3k.com.csr")
-    util.put('data/deadtree/public', '/var/www', 'zachary', mode='755')
+    util.put_dir('data/deadtree/public', '/var/www/public', mode='755', user='zachary')
 
     # etherpad.za3k.com
     package_ensure(["sqlite3"])
@@ -234,8 +220,8 @@ def deadtree():
     group_user_ensure('etherpad', 'etherpad')
     git.ensure_clone_github('ether/etherpad-lite', '/var/www/etherpad', commit='1.6.0', user='etherpad')
     nginx.ensure_site('config/nginx/etherpad.za3k.com', csr='config/certs/etherpad.za3k.com.csr', key='config/keys/etherpad.za3k.com.key', domain="etherpad.za3k.com", letsencrypt=True, cert="config/certs/etherpad.za3k.com.pem")
-    util.put("config/etherpad/APIKEY.txt", "/var/www/etherpad", user='etherpad', mode='600')
-    util.put("config/etherpad/settings.json", "/var/www/etherpad", user='etherpad', mode='644')
+    util.put_file("config/etherpad/APIKEY.txt", "/var/www/etherpad", user='etherpad', mode='600')
+    util.put_file("config/etherpad/settings.json", "/var/www/etherpad", user='etherpad', mode='644')
     if not files.exists("/var/www/etherpad/var/sqlite.db"):
         sudo("mkdir -p /var/www/etherpad/var", user='etherpad')
         with cd("/var/www/etherpad"):
@@ -247,12 +233,12 @@ def deadtree():
 
     # forsale
     nginx.ensure_site('config/nginx/forsale')
-    util.put('data/forsale', '/var/www', user='nobody', mode='755')
+    util.put_dir('data/forsale', '/var/www/forsale', mode='755', user='nobody')
 
     # gipc daily sync
     # github personal backup
     # github repo list
-    put("config/github/github-metadata-sync", "/etc/cron.daily", mode='755', use_sudo=True)
+    util.put_file("config/github/github-metadata-sync", "/etc/cron.daily/github-metadata-sync", mode='755', user='root')
 
     #                  -> updater
     # irc.za3k.com -> irc
@@ -262,7 +248,7 @@ def deadtree():
     group_ensure('jsfail')
     group_user_ensure('jsfail', 'jsfail')
     nginx.ensure_site('config/nginx/jsfail.com')
-    util.put('data/jsfail', '/var/www', 'jsfail', mode='755')
+    util.put_dir('data/jsfail', '/var/www/jsfail', 'jsfail', mode='755')
 
     # library.za3k.com -> website
     #                  -> sync script
@@ -282,7 +268,7 @@ def deadtree():
     files.append('/home/za3k/.ssh/authorized_keys', ssh_line, use_sudo=True)
 
     sudo("chown library:library /var/www/library")
-    put("config/library/library-sync", "/etc/cron.daily", mode='755', use_sudo=True)
+    util.put_file("config/library/library-sync", "/etc/cron.daily/library-sync", mode='755', user='root')
     sudo("/etc/cron.daily/library-sync")
     nginx.ensure_site('config/nginx/library.za3k.com', csr='config/certs/library.za3k.com.csr', key='config/keys/library.za3k.com.key', domain="library.za3k.com", letsencrypt=True, cert="config/certs/library.za3k.com.pem")
 
@@ -297,7 +283,7 @@ def deadtree():
 
     # nanowrimo.za3k.com
     nginx.ensure_site('config/nginx/nanowrimo.za3k.com', csr='config/certs/nanowrimo.za3k.com.csr', key='config/keys/nanowrimo.za3k.com.key', domain="nanowrimo.za3k.com", letsencrypt=True, cert="config/certs/nanowrimo.za3k.com.pem")
-    util.put('data/nanowrimo', '/var/www', user='nobody', mode='755')
+    util.put_dir('data/nanowrimo', '/var/www/nanowrimo', user='nobody', mode='755')
 
     # nntp.za3k.com - Discontinued
     # petchat.za3k.com
@@ -308,11 +294,17 @@ def deadtree():
     # publishing.za3k.com
     # thinkingtropes.com
     nginx.ensure_site('config/nginx/thinkingtropes.com')
-    util.put('data/thinkingtropes', '/var/www', user='nobody', mode='755')
+    util.put_dir('data/thinkingtropes', '/var/www/thinkingtropes', user='nobody', mode='755')
 
     # thisisashell.com
     nginx.ensure_site('config/nginx/thisisashell.com', csr='config/certs/thisisashell.com.csr', key='config/keys/thisisashell.com.key', domain="thisisashell.com", letsencrypt=True, cert="config/certs/thisisashell.com.pem")
 
+
+def deadtree2():
+    # isrickandmortyout.com
+    nginx.ensure_site('config/nginx/isrickandmortyout.com', csr='config/certs/isrickandmortyout.com.csr', key='config/keys/isrickandmortyout.com.key', domain="isrickandmortyout.com", letsencrypt=True, cert="config/certs/isrickandmortyout.com.pem")
+
+def deadtree_cont():
     # twitter archive
     # za3k.com
     user_ensure('za3k')
@@ -332,18 +324,19 @@ def deadtree():
     ruby.ensure_gems(["redcarpet"])
     # Databases .view
     package_ensure(["sqlite3"])
-    put("config/za3k/za3k-db-sync", "/etc/cron.daily", mode='755', use_sudo=True)
+    util.put_file("config/za3k/za3k-db-sync", "/etc/cron.daily/za3k-db-sync", mode='755', user='root')
     sudo("/etc/cron.daily/za3k-db-sync")
     # colony on the moon
-    sudo("rsync -av germinate.za3k.com::colony --delete /var/www/colony", user='nobody')
+    # disabled temp. because we're out of space
+    #sudo("rsync -av germinate.za3k.com::colony --delete /var/www/colony", user='nobody')
     # .sc
     package_ensure(["sc"])
     # |-- status.za3k.com
     nginx.ensure_site('config/nginx/status.za3k.com', csr='config/certs/status.za3k.com.csr', key='config/keys/status.za3k.com.key', domain="status.za3k.com", letsencrypt=True, cert="config/certs/status.za3k.com.pem")
     sudo("mkdir -p /var/www/status && chmod 755 /var/www/status")
-    util.put("/srv/keys/backup_check", "/var/www/status", user='fcgiwrap', mode='600')
-    util.put("/srv/keys/comcast.env", "/etc", user='fcgiwrap', mode='600')
-    #util.put("/srv/keys/backup_check.pub", "/var/www/status", user='fcgiwrap', mode='644')
+    util.put_file("/srv/keys/backup_check", "/var/www/status/backup_check", user='fcgiwrap', mode='600')
+    util.put_file("/srv/keys/comcast.env", "/etc/comcast.env", user='fcgiwrap', mode='600')
+    #util.put_file("/srv/keys/backup_check.pub", "/var/www/status/backup_check.pub", user='fcgiwrap', mode='644')
     package_ensure(["parallel", "curl", "python-requests"])
     nginx.reload()
 
@@ -352,40 +345,40 @@ def equilibrate():
     # Out of scope: Set up DNS (including poll script), ssh, sudo
 
     # Set up the firewall
-    put("config/firewalls/equilibrate.sh", "/usr/local/bin", use_sudo=True)
+    util.put_file("config/firewalls/equilibrate.sh", "/usr/local/bin/equilibrate.sh", mode='755', user='root')
     sudo("sh /usr/local/bin/equilibrate.sh")
-    put("config/firewalls/iptables", "/etc/network/if-pre-up.d/", use_sudo=True, mode='0755')
+    util.put_file("config/firewalls/iptables", "/etc/network/if-pre-up.d/iptables", mode='755', user='root')
 
     # Set up authorization to back up email to the data server
     public_key = ssh.ensure_key('/var/local/germinate-backup', use_sudo=True)
     with settings(user='zachary', host_string='germinate'):
         files.append('/home/equilibrate/.ssh/authorized_keys', public_key, use_sudo=True)
-    util.put("config/backup/sshconfig-equilibrate", "/root/.ssh/config", user='root')
+    util.put_file("config/backup/sshconfig-equilibrate", "/root/.ssh/config", user='root', mode='600')
 
     # Set up backup
     package_ensure(["rsync"])
-    util.put("config/backup/generic-backup.sh", "/var/local", mode='0755', user='root')
-    util.put("config/backup/backup-exclude-base", "/var/local/backup-exclude", mode='0644', user='root')
-    util.put("config/backup/backup-equilibrate.sh", "/etc/cron.daily/backup-equilibrate", mode='0755', user='root')
+    util.put_file("config/backup/generic-backup.sh", "/var/local", mode='755', user='root')
+    util.put_file("config/backup/backup-exclude-base", "/var/local/backup-exclude", mode='644', user='root')
+    util.put_file("config/backup/backup-equilibrate.sh", "/etc/cron.daily/backup-equilibrate", mode='755', user='root')
 
 def forget():
     """Forget does crawls"""
     # Set up the firewall
-    put("config/firewalls/forget.sh", "/usr/local/bin", use_sudo=True)
+    util.put_file("config/firewalls/forget.sh", "/usr/local/bin/forget.sh", mode='755', user='root')
     sudo("sh /usr/local/bin/forget.sh")
-    put("config/firewalls/iptables", "/etc/network/if-pre-up.d/", use_sudo=True, mode='0755')
+    util.put_file("config/firewalls/iptables", "/etc/network/if-pre-up.d/iptables", mode='755', user='root')
 
     # Set up authorization to back up email to the data server
     public_key = ssh.ensure_key('/var/local/forget-backup', use_sudo=True)
     with settings(user='zachary', host_string='germinate'):
         files.append('/home/forget/.ssh/authorized_keys', public_key, use_sudo=True)
-    util.put("config/backup/sshconfig-forget", "/root/.ssh/config", user='root')
+    util.put_file("config/backup/sshconfig-forget", "/root/.ssh/config", user='root', mode='600')
 
     # Set up backup
     package_ensure(["rsync"])
-    util.put("config/backup/generic-backup.sh", "/var/local", mode='0755', user='root')
-    util.put("config/backup/backup-exclude-base", "/var/local/backup-exclude", mode='0644', user='root')
-    util.put("config/backup/backup-forget.sh", "/etc/cron.daily/backup-equilibrate", mode='0755', user='root')
+    util.put_file("config/backup/generic-backup.sh", "/var/local", mode='755', user='root')
+    util.put_file("config/backup/backup-exclude-base", "/var/local/backup-exclude", mode='644', user='root')
+    util.put_file("config/backup/backup-forget.sh", "/etc/cron.daily/backup-equilibrate", mode='755', user='root')
 
     # Start a webserver
     already_installed = nginx.ensure()
@@ -398,18 +391,56 @@ def forget():
     nginx.ensure_site('config/nginx/forget.za3k.com', cert='config/certs/forget.za3k.com.pem', key='config/keys/forget.za3k.com.key', domain="forget.za3k.com", letsencrypt=True, csr="config/certs/forget.za3k.com.csr")
     with mode_sudo():
         dir_ensure("/var/www/public", mode=755)
-    util.put('data/forget/public', '/var/www', 'zachary', mode='755')
+    util.put_dir('data/forget/public', '/var/www/public', mode='755', user='zachary')
 
     # logging
+
+    nginx.restart()
+
+def invent():
+    """Invent is a raspberry pi that connects to the printer. It's LAN only"""
+
+    # Set up logging
+    logs.setup()
+
+    # Set up the firewall
+    util.put_file("config/firewalls/invent.sh", "/usr/local/bin/invent.sh", mode='755', user='root')
+    sudo("sh /usr/local/bin/invent.sh")
+    util.put_file("config/firewalls/iptables", "/etc/network/if-pre-up.d/iptables", mode='755', user='root')
+
+    # Set up authorization to back up to germinate
+    public_key = ssh.ensure_key('/var/local/invent-backup', use_sudo=True)
+    with settings(user='zachary', host_string='germinate'):
+        files.append('/home/invent/.ssh/authorized_keys', public_key, use_sudo=True)
+    util.put_file("config/backup/sshconfig-invent", "/root/.ssh/config", user='root', mode='600')
+
+    # Set up backup
+    package_ensure(["rsync"])
+    util.put_file("config/backup/generic-backup.sh", "/var/local/generic-backup.sh", mode='755', user='root')
+    util.put_file("config/backup/backup-exclude-base", "/var/local/backup-exclude", mode='644', user='root')
+    util.put_file("config/backup/backup-invent.sh", "/etc/cron.daily/backup-invent", mode='755', user='root')
+    # github-backup setup is manual. Look on github and at cron entry. Backs up to germinate:/data/github
+
+    # Start a webserver
+    already_installed = nginx.ensure()
+    nginx.remove_default_sites()
+    if not already_installed:
+        nginx.restart() # IPv[46] listener only changes on restart
+
+    letsencrypt.ensure()
+
+    # avalanche.za3k.com
+    nginx.ensure_site('config/nginx/invent.za3k.com', cert='config/certs/invent.za3k.com.pem', key='config/keys/invent.za3k.com.key', domain="invent.za3k.com", letsencrypt=True, csr="config/certs/invent.za3k.com.csr")
+    util.put_dir('data/invent/public', '/var/www/public', mode='755', user='zachary')
 
     nginx.restart()
 
 def xenu():
     """Xenu runs minecraft."""
     # Set up the firewall
-    put("config/firewalls/xenu.sh", "/usr/local/bin", use_sudo=True)
+    util.put_file("config/firewalls/xenu.sh", "/usr/local/bin/xenu.sh", mode='755', user='root')
     sudo("sh /usr/local/bin/xenu.sh")
-    put("config/firewalls/iptables", "/etc/network/if-pre-up.d/", use_sudo=True, mode='0755')
+    util.put_file("config/firewalls/iptables", "/etc/network/if-pre-up.d/", mode='755', user='root')
 
     # Set up logging
     logs.setup()
@@ -419,13 +450,13 @@ def xenu():
     with settings(user='zachary', host_string='germinate'):
         files.append('/home/xenu-linux/.ssh/authorized_keys', public_key, use_sudo=True)
     sudo("mkdir -p /root/.ssh")
-    util.put("config/backup/sshconfig-xenu", "/root/.ssh/config", user='root')
+    util.put_file("config/backup/sshconfig-xenu", "/root/.ssh/config", user='root')
 
     # Set up backup
     package_ensure(["rsync"])
-    util.put("config/backup/generic-backup.sh", "/var/local", mode='0755', user='root')
-    util.put("config/backup/backup-exclude-xenu", "/var/local/backup-exclude", mode='0644', user='root')
-    util.put("config/backup/backup-xenu.sh", "/etc/cron.daily/backup-xenu", mode='0755', user='root')
+    util.put_file("config/backup/generic-backup.sh", "/var/local", mode='755', user='root')
+    util.put_file("config/backup/backup-exclude-xenu", "/var/local/backup-exclude", mode='644', user='root')
+    util.put_file("config/backup/backup-xenu.sh", "/etc/cron.daily/backup-xenu", mode='755', user='root')
 
     # Minecraft prereqs
     package_ensure(["make", "tmux"])
@@ -442,6 +473,6 @@ def xenu():
     already_installed = nginx.ensure()
     if not already_installed:
         nginx.restart() # IPv[46] listener only changes on restart
-    util.put("data/minecraft-www", "/var/www", user="minecraft")
+    util.put_dir("data/minecraft-www", "/var/www/minecraft-www", user="minecraft")
     nginx.ensure_site('config/nginx/minecraft.za3k.com')
     nginx.reload()
