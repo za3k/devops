@@ -1,7 +1,7 @@
 # These servers only listen on HTTPS, redirect HTTP requests
 server {
-    listen [::]:80;
-    server_name    avalanche.za3k.com;
+    listen [::]:80 ipv6only=off;
+    server_name    _; # avalanche.za3k.com;
     location ~ /.well-known {
         allow all;
         root /var/www/well-known/avalanche.za3k.com;
@@ -13,9 +13,9 @@ server {
 
 
 server {
-    listen [::]:443 ssl ipv6only=off;
+    listen [::]:443 ssl;
 
-    server_name avalanche.za3k.com;
+    server_name _; # avalanche.za3k.com;
 
     ssl_certificate /etc/ssl/certs/avalanche.za3k.com.pem;
     ssl_certificate_key /etc/ssl/private/avalanche.za3k.com.key;

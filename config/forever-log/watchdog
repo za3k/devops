@@ -1,2 +1,2 @@
 #!/bin/sh
-/bin/log watchdog "Ran from cron.daily"
+echo "Ran from cron.daily | /bin/log watchdog

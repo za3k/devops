@@ -23,7 +23,8 @@ def ensure():
     files.append('/etc/sudoers', 'acme    ALL=(root) NOPASSWD: {reload_nginx}'.format(reload_nginx=_reload_nginx()), use_sudo=True)
 
     # Make sure acme.sh is installed for the acme user
-    if not path.has('acme.sh', user='acme'):
+    # if not path.has('acme.sh', user='acme'): Does not exist--it's imported from bash
+    if not files.exists('/home/acme/.acme.sh'):
         git.ensure_clone_github('Neilpang/acme.sh', '/home/acme/acme.sh', user='acme')
         with cd("/home/acme/acme.sh"):
             sudo("./acme.sh --install", user='acme')

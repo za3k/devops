@@ -1,7 +1,5 @@
 Source code: https://github.com/za3k/devops
-Printer:     https://blog.za3k.com/linux-print-server/
 Snapshotted daily to germinate.za3k.com
 
 Service           Public?
-print server      no
-                  scp <file> avalanche.za3k.com:/printme
+no services

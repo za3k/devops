@@ -1,11 +1,13 @@
+NC="netcat"
 LOG=/var/log/diskstat
+
 mkdir -p $LOG
 send_stats () {
     # usage: send_stats $name $value $target_unit
     while read conv; do
     #echo "disks.$(hostname).$conv" >/dev/stderr
     echo "disks.$(hostname).$conv" | 
-    netcat -u -w 4 -i 4 graph.za3k.com 8125
+    $NC -u -w 4 -i 4 graph.za3k.com 8125
     done
 }
 
@@ -31,5 +33,5 @@ df --block-size=1 --output=target,size,used --exclude-type=tmpfs --exclude-type=
 
 # Try curling www.example.com
 #CURLTIME=$(docker run --dns 4.2.2.2 --rm curltest bash -c 'time -p curl -o /dev/null -s www.example.com' 2>&1 | grep real | awk '{print $2}')
-#echo "speedtest.curltime:$CURLTIME|g" | ncat -u -4 -w 4 -i 4 graph.za3k.com 8125
+#echo "speedtest.curltime:$CURLTIME|g" | $NC -u -4 -w 4 -i 4 graph.za3k.com 8125
  

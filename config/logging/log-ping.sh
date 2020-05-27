@@ -1,4 +1,6 @@
 #!/bin/sh
+export NC="netcat"
+
 send_stats(){
     while read conv; do
 	    echo "ping.$(hostname).$conv" | 

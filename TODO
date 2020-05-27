@@ -31,3 +31,10 @@
     /var/lib/postgresql/9.4/main
     /var/mail/vmail
 
+- 'mon'
+    - install 'mon' and 'mon-contrib'
+    - https.monitor is custom-made
+    - /etc/mon/mon.cf
+    - 'mon' on germinate uses special SSH keys for each server, set those up here
+- ~/documents/journal/2020-05-20.txt has a review of cron. Put everything listed there into devops--streamline things, etc.
+- switch from modifying crontab anywhere, to populating /etc/cron.d

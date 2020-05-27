@@ -1,4 +1,5 @@
 #!/bin/bash
+export NC="netcat"
 IFACE=enp3s0
 send_stats () {
     # usage: send_stats $name $value $target_unit
@@ -7,7 +8,7 @@ send_stats () {
     else
         conv=$(units -o "%.0f" -t "$2" "$3")
     fi
-    echo "vnstat.$(hostname).eth0:$conv|g" | netcat -u -w 2 graph.za3k.com 8125
+    echo "vnstat.$(hostname).eth0:$conv|g" | $NC -u -w 2 graph.za3k.com 8125
 }
 
 # Example output of vnstat --oneline
