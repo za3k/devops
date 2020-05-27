@@ -1,0 +1,9 @@
+Source code: https://github.com/za3k/devops
+Printer:     https://blog.za3k.com/linux-print-server/
+Snapshotted daily to germinate.za3k.com
+
+Service           Public?
+print server      no
+                  ssh <me> PRINTER=HL2270DW lp                   # Single-sided
+                  ssh <me> PRINTER=HL2270DW lp - -o media=letter # Duplex
+
