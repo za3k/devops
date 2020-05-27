@@ -299,12 +299,9 @@ def deadtree():
     # thisisashell.com
     nginx.ensure_site('config/nginx/thisisashell.com', csr='config/certs/thisisashell.com.csr', key='config/keys/thisisashell.com.key', domain="thisisashell.com", letsencrypt=True, cert="config/certs/thisisashell.com.pem")
 
-
-def deadtree2():
     # isrickandmortyout.com
     nginx.ensure_site('config/nginx/isrickandmortyout.com', csr='config/certs/isrickandmortyout.com.csr', key='config/keys/isrickandmortyout.com.key', domain="isrickandmortyout.com", letsencrypt=True, cert="config/certs/isrickandmortyout.com.pem")
 
-def deadtree_cont():
     # twitter archive
     # za3k.com
     user_ensure('za3k')
@@ -339,63 +336,6 @@ def deadtree_cont():
     #util.put_file("/srv/keys/backup_check.pub", "/var/www/status/backup_check.pub", user='fcgiwrap', mode='644')
     package_ensure(["parallel", "curl", "python-requests"])
     nginx.reload()
-
-def equilibrate():
-    """Equilibrate runs games."""
-    # Out of scope: Set up DNS (including poll script), ssh, sudo
-
-    # Set up the firewall
-    util.put_file("config/firewalls/equilibrate.sh", "/usr/local/bin/equilibrate.sh", mode='755', user='root')
-    sudo("sh /usr/local/bin/equilibrate.sh")
-    util.put_file("config/firewalls/iptables", "/etc/network/if-pre-up.d/iptables", mode='755', user='root')
-
-    # Set up authorization to back up email to the data server
-    public_key = ssh.ensure_key('/var/local/germinate-backup', use_sudo=True)
-    with settings(user='zachary', host_string='germinate'):
-        files.append('/home/equilibrate/.ssh/authorized_keys', public_key, use_sudo=True)
-    util.put_file("config/backup/sshconfig-equilibrate", "/root/.ssh/config", user='root', mode='600')
-
-    # Set up backup
-    package_ensure(["rsync"])
-    util.put_file("config/backup/generic-backup.sh", "/var/local", mode='755', user='root')
-    util.put_file("config/backup/backup-exclude-base", "/var/local/backup-exclude", mode='644', user='root')
-    util.put_file("config/backup/backup-equilibrate.sh", "/etc/cron.daily/backup-equilibrate", mode='755', user='root')
-
-def forget():
-    """Forget does crawls"""
-    # Set up the firewall
-    util.put_file("config/firewalls/forget.sh", "/usr/local/bin/forget.sh", mode='755', user='root')
-    sudo("sh /usr/local/bin/forget.sh")
-    util.put_file("config/firewalls/iptables", "/etc/network/if-pre-up.d/iptables", mode='755', user='root')
-
-    # Set up authorization to back up email to the data server
-    public_key = ssh.ensure_key('/var/local/forget-backup', use_sudo=True)
-    with settings(user='zachary', host_string='germinate'):
-        files.append('/home/forget/.ssh/authorized_keys', public_key, use_sudo=True)
-    util.put_file("config/backup/sshconfig-forget", "/root/.ssh/config", user='root', mode='600')
-
-    # Set up backup
-    package_ensure(["rsync"])
-    util.put_file("config/backup/generic-backup.sh", "/var/local", mode='755', user='root')
-    util.put_file("config/backup/backup-exclude-base", "/var/local/backup-exclude", mode='644', user='root')
-    util.put_file("config/backup/backup-forget.sh", "/etc/cron.daily/backup-equilibrate", mode='755', user='root')
-
-    # Start a webserver
-    already_installed = nginx.ensure()
-    if not already_installed:
-        nginx.restart() # IPv[46] listener only changes on restart
-
-    letsencrypt.ensure()
-
-    # forget.za3k.com
-    nginx.ensure_site('config/nginx/forget.za3k.com', cert='config/certs/forget.za3k.com.pem', key='config/keys/forget.za3k.com.key', domain="forget.za3k.com", letsencrypt=True, csr="config/certs/forget.za3k.com.csr")
-    with mode_sudo():
-        dir_ensure("/var/www/public", mode=755)
-    util.put_dir('data/forget/public', '/var/www/public', mode='755', user='zachary')
-
-    # logging
-
-    nginx.restart()
 
 def invent():
     """Invent is a raspberry pi that connects to the printer. It's LAN only"""
