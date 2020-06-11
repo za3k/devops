@@ -1,4 +1,0 @@
-Host germinate-backup
-    Hostname germinate.za3k.com
-    IdentityFile /var/local/germinate-backup
-    User avalanche

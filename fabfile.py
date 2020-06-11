@@ -11,45 +11,6 @@ import apt, git, letsencrypt, logs, mx, nginx, node, path, ruby, ssh, supervisor
 env.shell = '/bin/sh -c'
 env.use_ssh_config = True
 
-def avalanche():
-    """Avalanche doesn't really run anything except the printserver, it's a point of presence."""
-
-    # Set up logging
-    logs.setup()
-
-    # Set up the firewall
-    util.put_file("config/firewalls/avalanche.sh", "/usr/local/bin/avalanche.sh", mode='755', user='root')
-    sudo("sh /usr/local/bin/avalanche.sh")
-    util.put_file("config/firewalls/iptables", "/etc/network/if-pre-up.d/ip_tables", mode='755', user='root')
-    util.put_file("config/backup/backup-avalanche.sh", "/etc/cron.daily/backup-avalanche", mode='755', user='root')
-
-    # Set up authorization to back up to germinate
-    public_key = ssh.ensure_key('/var/local/germinate-backup', use_sudo=True)
-    with settings(user='zachary', host_string='germinate'):
-        files.append('/home/avalanche/.ssh/authorized_keys', public_key, use_sudo=True)
-    util.put_file("config/backup/sshconfig-avalanche", "/root/.ssh/config", user='root')
-
-    # Set up backup
-    package_ensure(["rsync"])
-    util.put_file("config/backup/generic-backup.sh", "/var/local/generic-backup.sh", mode='755', user='root')
-    util.put_file("config/backup/backup-exclude-avalanche", "/var/local/backup-exclude", mode='644', user='root')
-    util.put_file("config/backup/backup-avalanche.sh", "/etc/cron.daily/backup-avalanche", mode='755', user='root')
-    # github-backup setup is manual. Look on github and at cron entry. Backs up to germinate:/data/github
-
-    # Start a webserver
-    already_installed = nginx.ensure()
-    nginx.remove_default_sites()
-    if not already_installed:
-        nginx.restart() # IPv[46] listener only changes on restart
-
-    letsencrypt.ensure()
-
-    # avalanche.za3k.com
-    nginx.ensure_site('config/nginx/avalanche.za3k.com', cert='config/certs/avalanche.za3k.com.pem', key='config/keys/avalanche.za3k.com.key', domain="avalanche.za3k.com", letsencrypt=True, csr="config/certs/avalanche.za3k.com.csr")
-    util.put_dir('data/avalanche/public', '/var/www/public', mode='755', user='zachary')
-
-    nginx.restart()
-
 # fab -H corrupt corrupt
 # Run this on Debian 8
 def corrupt():
@@ -369,7 +330,7 @@ def invent():
 
     letsencrypt.ensure()
 
-    # avalanche.za3k.com
+    # invent.za3k.com
     nginx.ensure_site('config/nginx/invent.za3k.com', cert='config/certs/invent.za3k.com.pem', key='config/keys/invent.za3k.com.key', domain="invent.za3k.com", letsencrypt=True, csr="config/certs/invent.za3k.com.csr")
     util.put_dir('data/invent/public', '/var/www/public', mode='755', user='zachary')
 

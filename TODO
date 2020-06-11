@@ -1,13 +1,12 @@
-- Re-enable library card catalog
-- Add github archiving declarative section to avalanche
+- Re-enable library card catalog -- nope, delete it
 - Make sure tron's github-archive backup is running
 - Put DDNS on its own IP
-- Add irc.za3k.com
-- Fix publishing.za3k.com
+- Add irc.za3k.com -- nope, removed
+- Fix publishing.za3k.com -- probably nope, removed
 - Re-Enable automatic twitter backup and sync to web server
 - Add SNI (alt-names) for za3k.com so www. works right
 - Add CAA for za3k.com, etc
-- Add letsencrypt and HTTPS for minecraft.za3k.com
+- Add letsencrypt and HTTPS for minecraft.za3k.com -- nope, removed
 - Monitor energy usage: https://pge.opower.com/ei/x/energy-usage-details#!wdb/usage/electricity/day/2017-10-04?accountUuid=<redacted>
 
 - Add disk monitoring and statistic reporting. Add comcast to this.
