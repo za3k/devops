@@ -2,27 +2,30 @@
 from __future__ import absolute_import
 from __future__ import print_function
 
-from fabric.api import run, env, sudo, put, get, cd, settings, hosts
+from fabric.api import run, sudo
 from fabric.contrib import files
 from cuisine import dir_ensure, group_ensure, mode_sudo
 import random, string, util
 
-def put_csr(csr):
+def put_csr(csr, user='root'):
     with mode_sudo():
         dir_ensure('/etc/ssl/csr', mode='1777')
-    return put(csr, '/etc/ssl/csr', mode='0644')[0]
+    csr_name = csr.split("/")[-1]
+    return util.put_file(csr, '/etc/ssl/csr/'+csr_name, mode='0644', user=user)[0]
 
-def put_cert(cert, user=None):
+def put_cert(cert, user='root'):
     with mode_sudo():
         dir_ensure('/etc/ssl/certs', mode='1777')
     if user is None:
         user = 'root'
-    return util.put(cert, '/etc/ssl/certs', mode='0644', user=user)[0]
+    cert_name = cert.split("/")[-1]
+    return util.put_file(cert, '/etc/ssl/certs/'+cert_name, mode='0644', user=user)[0]
 
-def put_key(key, **kwargs):
+def put_key(key, user='root'):
     with mode_sudo():
         dir_ensure('/etc/ssl/private', mode='1777')
-    return put(key, '/etc/ssl/private', mode='0640', **kwargs)[0]
+    key_name = key.split("/")[-1]
+    return util.put_file(key, '/etc/ssl/private/'+key_name, mode='0640', user=user)[0]
 
 def ensure_dhparams(path='/etc/ssl/dhparams.pem', size=2048):
     if not files.exists(path):

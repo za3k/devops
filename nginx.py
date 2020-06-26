@@ -2,7 +2,7 @@
 from __future__ import absolute_import
 from __future__ import print_function
 
-from fabric.api import run, env, sudo, put, get, cd, settings, hosts
+from fabric.api import run, env, sudo, get, cd, settings, hosts
 from cuisine import dir_ensure, group_ensure, group_user_ensure, mode_sudo, select_package, package_ensure, user_ensure
 import crypto, util
 
@@ -17,8 +17,8 @@ def ensure():
     if not already_installed:
         remove_default_sites()
     ensure_sites_available()
-    put('config/nginx/nginx.conf', '/etc/nginx', use_sudo=True)
-    put('config/nginx/fastcgi_params', '/etc/nginx', use_sudo=True)
+    util.put_file('config/nginx/nginx.conf', '/etc/nginx/nginx.conf', user='root', mode='0644')
+    util.put_file('config/nginx/fastcgi_params', '/etc/nginx/fastcgi_params', user='root', mode='0644')
     crypto.ensure_dhparams('/etc/ssl/dhparams-nginx.pem')
     with mode_sudo():
         dir_ensure("/var/www", mode='1777') # make sure anyone can add a site
@@ -51,7 +51,8 @@ def ensure_site(config_file, cert=None, csr=None, key=None, letsencrypt=False, d
     assert not (letsencrypt and not csr) # We've opted to use CSR as the input to acme.sh
     assert not (letsencrypt and not domain) # we can't infer the well-known-path on disk without some extra help
     ensure_sites_available()
-    placed_config = put(config_file, '/etc/nginx/sites-available')[0]
+    placed_config = '/etc/nginx/sites-available/' + config_file.split("/")[-1]
+    util.put_file(config_file, placed_config, user='root', mode='0644')
     if key is not None:
         crypto.put_key(key)
     if csr is not None:
@@ -75,7 +76,7 @@ def ensure_fcgiwrap(children=4):
     group_user_ensure('fcgiwrap', 'fcgiwrap')
     
     # Needed because of Debian bug https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=792705. Fastcgi 1.1.0-6 (unstable as of writing) fixes this bug.
-    util.put("config/systemd/fcgiwrap.service", "/etc/systemd/system", mode='0644', user='root')
+    util.put_file("config/systemd/fcgiwrap.service", "/etc/systemd/system/gcgiwrap.service", mode='0644', user='root')
     # Not sure these two lines actually do anything
     sudo('sed -i "s/www-data/fcgiwrap/" /lib/systemd/system/fcgiwrap.service')
     sudo('echo "FCGI_CHILDREN={}" > /etc/default/fcgiwrap'.format(children))

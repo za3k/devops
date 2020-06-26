@@ -289,14 +289,17 @@ def deadtree():
     #sudo("rsync -av germinate.za3k.com::colony --delete /var/www/colony", user='nobody')
     # .sc
     package_ensure(["sc"])
-    # |-- status.za3k.com
-    nginx.ensure_site('config/nginx/status.za3k.com', csr='config/certs/status.za3k.com.csr', key='config/keys/status.za3k.com.key', domain="status.za3k.com", letsencrypt=True, cert="config/certs/status.za3k.com.pem")
-    sudo("mkdir -p /var/www/status && chmod 755 /var/www/status")
-    util.put_file("/srv/keys/backup_check", "/var/www/status/backup_check", user='fcgiwrap', mode='600')
-    util.put_file("/srv/keys/comcast.env", "/etc/comcast.env", user='fcgiwrap', mode='600')
-    #util.put_file("/srv/keys/backup_check.pub", "/var/www/status/backup_check.pub", user='fcgiwrap', mode='644')
-    package_ensure(["parallel", "curl", "python-requests"])
+
     nginx.reload()
+
+def germinate():
+    """Germinate is the data server. It hosts stuff that is privately-accessible.
+    Germinate runs Debian."""
+    apt.sudo_ensure() # cuisine.package_ensure is broken otherwise
+
+    # status.za3k.com
+    letsencrypt.ensure()
+    nginx.ensure_site('config/nginx/status.za3k.com', cert='config/certs/status.za3k.com.pem', key='config/keys/status.za3k.com.key', domain="status.za3k.com", letsencrypt=True, csr="config/certs/status.za3k.com.csr")
 
 def invent():
     """Invent is a raspberry pi that connects to the printer. It's LAN only"""
