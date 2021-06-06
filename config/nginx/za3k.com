@@ -27,6 +27,31 @@ server {
     index index.html index.md;
     root /var/www/za3k;
 
+    location = /archived.html { return 302 /archive/; }
+    location = '/new latin bible.txt' { return 302 /archive/new_latin_bible.txt; }
+    location = /mygames.md { return 302 /games/; }
+    location = /archive/conspiracies.md { return 302 /games/conspiracies; }
+    location = /archive/deadly.md { return 302 /games/deadly; }
+    location = /archive/doodle_adventures.md { return 302 /games/doodle_adventures; }
+    location = /archive/emperical_zendo.md { return 302 /games/emperical_zendo; }
+    location = /archive/faux_pas.md { return 302 /games/faux_pas; }
+    location = /archive/invincible1.md { return 302 /games/invincible1; }
+    location = /archive/invincible.md { return 302 /games/invincible; }
+    location = /archive/invincible.css { return 302 /games/invincible.css; }
+    location = /archive/logic_potions.md { return 302 /games/logic_potions; }
+    location = /archive/lootboxes.md { return 302 /games/lootboxes; }
+    location = /archive/ninjas1.md { return 302 /games/ninjas1; }
+    location = /archive/ninjas.md { return 302 /games/ninjas; }
+    location = /archive/stupid_russia.md { return 302 /games/stupid_russia; }
+    location = /archive/stupid_russia.py { return 302 /games/stupid_russia.py; }
+    location = /archive/ultimate_archwizard.md { return 302 /games/ultimate_archwizard; }
+    location = /archive/ultimate_archwizard_gm.md { return 302 /games/ultimate_archwizard_gm; }
+    location = /archive/colony.md { return 302 /games/colony; }
+    location = /games.md { return 302 /videogames; }
+    location = /stylish.view { return 302 /archive/stylish.view; }
+    location = /aldenmarsh/party { return 302 /aldenmarsh/party/players1; }
+    location = /aldenmarsh/party/ { return 302 /aldenmarsh/party/players1; }
+
     location /github/ {
         alias /var/www/github/;
         gzip on;
@@ -54,6 +79,7 @@ server {
 
     #fastcgi_param REQUEST_METHOD $request_method;
     location ~ \.md$ {
+        try_files $uri archive/$uri =404;
         set $processor /cgi-bin/markdown/Markdown.cgi;
         fastcgi_pass  unix:/var/run/fcgiwrap.socket;
     }
@@ -65,8 +91,7 @@ server {
         set $processor /cgi-bin/sc.txt.cgi;
         fastcgi_pass  unix:/var/run/fcgiwrap.socket;
     }
-    location ~ \.status$ {
-        set $processor /cgi-bin/status.cgi;
-        fastcgi_pass  unix:/var/run/fcgiwrap.socket;
+    location ~ {
+        try_files $uri $uri/ $uri.html archive/$uri.html $uri.md; # the last parameter is a magic redirect
     }
 }
