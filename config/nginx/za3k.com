@@ -91,7 +91,7 @@ server {
         set $processor /cgi-bin/sc.txt.cgi;
         fastcgi_pass  unix:/var/run/fcgiwrap.socket;
     }
-    location ~ {
+    location / {
         try_files $uri $uri/ $uri.html archive/$uri.html $uri.md; # the last parameter is a magic redirect
     }
 }

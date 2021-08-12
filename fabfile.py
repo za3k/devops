@@ -308,14 +308,15 @@ def invent():
     logs.setup()
 
     # Set up the firewall
-    util.put_file("config/firewalls/invent.sh", "/usr/local/bin/invent.sh", mode='755', user='root')
-    sudo("sh /usr/local/bin/invent.sh")
-    util.put_file("config/firewalls/iptables", "/etc/network/if-pre-up.d/iptables", mode='755', user='root')
+    #util.put_file("config/firewalls/invent.sh", "/etc/firewall.sh", mode='755', user='root')
+    #sudo("sh /etc/firewall.sh")
+    #util.put_file("config/firewalls/iptables", "/etc/network/if-pre-up.d/iptables", mode='755', user='root')
 
     # Set up authorization to back up to germinate
-    public_key = ssh.ensure_key('/var/local/invent-backup', use_sudo=True)
+    public_key = ssh.ensure_key('/var/local/germinate-backup', use_sudo=True)
     with settings(user='zachary', host_string='germinate'):
         files.append('/home/invent/.ssh/authorized_keys', public_key, use_sudo=True)
+    # TODO: Actually, make /root/.ssh first
     util.put_file("config/backup/sshconfig-invent", "/root/.ssh/config", user='root', mode='600')
 
     # Set up backup
@@ -327,15 +328,15 @@ def invent():
 
     # Start a webserver
     already_installed = nginx.ensure()
-    nginx.remove_default_sites()
+    #nginx.remove_default_sites()
     if not already_installed:
         nginx.restart() # IPv[46] listener only changes on restart
 
     letsencrypt.ensure()
 
     # invent.za3k.com
-    nginx.ensure_site('config/nginx/invent.za3k.com', cert='config/certs/invent.za3k.com.pem', key='config/keys/invent.za3k.com.key', domain="invent.za3k.com", letsencrypt=True, csr="config/certs/invent.za3k.com.csr")
-    util.put_dir('data/invent/public', '/var/www/public', mode='755', user='zachary')
+    nginx.ensure_site('config/nginx/invent.za3k.com') # read-only boot and LetsEncrypt are not easy to make work together, but no TLS is okay for a LAN-only site
+    util.put_dir('data/invent/public', '/var/www', mode='755', user='pi')
 
     nginx.restart()
 
@@ -380,3 +381,17 @@ def xenu():
     util.put_dir("data/minecraft-www", "/var/www/minecraft-www", user="minecraft")
     nginx.ensure_site('config/nginx/minecraft.za3k.com')
     nginx.reload()
+
+def tilde():
+    # Set up authorization to back up
+    public_key = ssh.ensure_key('/var/local/germinate-backup', use_sudo=True)
+    with settings(user='zachary', host_string='germinate'):
+        files.append('/home/xenu-linux/.ssh/authorized_keys', public_key, use_sudo=True)
+    sudo("mkdir -p /root/.ssh")
+    util.put_file("config/backup/sshconfig-xenu", "/root/.ssh/config", user='root')
+
+    # Set up backup
+    package_ensure(["rsync"])
+    util.put_file("config/backup/generic-backup.sh", "/var/local/generic-backup.sh", mode='755', user='root')
+    util.put_file("config/backup/backup-exclude-tilde", "/var/local/backup-exclude", mode='644', user='root')
+    util.put_file("config/backup/backup-tilde.sh", "/etc/cron.daily/backup", mode='755', user='root')

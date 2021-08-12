@@ -1,6 +1,6 @@
 $ORIGIN moreorcs.com.
 $TTL 1800
-@       IN      SOA     ns.za3k.com. za3k.za3k.com. (
+@       IN      SOA     ns.za3k.com. moreorcs.com. (
                         __SERIAL_NUMBER__       ; serial number
                         3600                    ; refresh
                         900                     ; retry

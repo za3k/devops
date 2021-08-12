@@ -1,2 +1,3 @@
 #!/bin/sh
-rsync -avr germinate.za3k.com::github-metadata/ /var/www/github --delete
+# Temporarily turn off because deadtree is out of space.
+#rsync -avr germinate.za3k.com::github-metadata/ /var/www/github --delete

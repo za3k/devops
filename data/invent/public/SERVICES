@@ -4,6 +4,6 @@ Snapshotted daily to germinate.za3k.com
 
 Service           Public?
 print server      no
-                  ssh <me> PRINTER=HL2270DW lp                   # Single-sided
-                  ssh <me> PRINTER=HL2270DW lp - -o media=letter # Duplex
+                  ssh <me> lp                               # Single-sided
+                  ssh <me> lp -o sides=two-sided-short-edge # Duplex
 
