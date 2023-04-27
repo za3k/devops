@@ -4,7 +4,7 @@ from __future__ import print_function
 
 from fabric.api import cd, get, local, put, run, settings
 from fabric.contrib import files
-from cuisine import dir_ensure, dir_exists, group_ensure, group_user_ensure, select_package, user_ensure, package_ensure
+#from cuisine import dir_ensure, dir_exists, group_ensure, group_user_ensure, select_package, user_ensure, package_ensure
 import crypto, postgres
 
 def ensure(restore=True):

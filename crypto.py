@@ -4,7 +4,7 @@ from __future__ import print_function
 
 from fabric.api import run, sudo
 from fabric.contrib import files
-from cuisine import dir_ensure, group_ensure, mode_sudo
+#from cuisine import dir_ensure, group_ensure, mode_sudo
 import random, string, util
 
 def put_csr(csr, user='root'):

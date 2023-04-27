@@ -4,7 +4,7 @@ from __future__ import print_function
 
 from fabric.api import cd, run, env, sudo, put, get, cd, settings, hosts
 from fabric.contrib import files
-from cuisine import dir_ensure, select_package, package_ensure
+#from cuisine import dir_ensure, select_package, package_ensure
 
 def runorsuch(*args, **kwargs):
     user = kwargs.get("user", None)

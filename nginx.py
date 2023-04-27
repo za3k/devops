@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 from fabric.api import run, env, sudo, get, cd, settings, hosts
-from cuisine import dir_ensure, group_ensure, group_user_ensure, mode_sudo, select_package, package_ensure, user_ensure
+#from cuisine import dir_ensure, group_ensure, group_user_ensure, mode_sudo, select_package, package_ensure, user_ensure
 import crypto, util
 
 def ensure():

@@ -16,4 +16,4 @@ To generate the .pem files in this directory, concatenate
  - ca certficate is left out, or some browsers will complain
    # https://www.startssl.com/certs/ca.crt
 
-    cat ${DOMAIN}.crt sca.server1.crt >${DOMAIN}.pem
+    #cat ${DOMAIN}.crt sca.server1.crt >${DOMAIN}.pem

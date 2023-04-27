@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 from fabric.api import sudo, cd, settings
 from fabric.contrib import files
-from cuisine import dir_ensure, group_ensure, group_user_ensure, user_ensure
+#from cuisine import dir_ensure, group_ensure, group_user_ensure, user_ensure
 import crypto
 import path, git, util
 

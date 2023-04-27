@@ -1,8 +1,5 @@
 #!/usr/bin/python2
-from __future__ import absolute_import
-from __future__ import print_function
-
-import StringIO
+import io
 from fabric.api import run, env, sudo, put, get, cd, settings, hosts
 from fabric.contrib import files
 
@@ -19,7 +16,7 @@ def create_key(path, use_sudo=False):
         run(command)
 
 def get_public_key(path, use_sudo=False):
-    output = StringIO.StringIO()
+    output = io.StringIO()
     get(path + '.pub', output, use_sudo=use_sudo)
     public_key = output.getvalue()
     output.close()

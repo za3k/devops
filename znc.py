@@ -1,4 +1,4 @@
-from cuisine import dir_ensure, group_ensure, group_user_ensure, package_ensure, select_package, user_ensure
+#from cuisine import dir_ensure, group_ensure, group_user_ensure, package_ensure, select_package, user_ensure
 import systemd, util
 from fabric.api import run
 def ensure():

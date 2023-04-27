@@ -2,7 +2,7 @@
 from __future__ import absolute_import
 from __future__ import print_function
 
-from cuisine import package_ensure
+#from cuisine import package_ensure
 from fabric.api import sudo, put
 
 def ensure():

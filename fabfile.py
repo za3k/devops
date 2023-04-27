@@ -1,11 +1,9 @@
-from __future__ import print_function
 import sys
 sys.dont_write_bytecode = True
 
 from fabric.api import run, env, sudo, cd, settings
 from fabric.contrib import files
-from cuisine import dir_ensure, dir_exists, group_ensure, group_user_ensure, mode_sudo, package_ensure, user_ensure
-from StringIO import StringIO
+#from cuisine import dir_ensure, dir_exists, group_ensure, group_user_ensure, mode_sudo, package_ensure, user_ensure
 import apt, git, letsencrypt, logs, mx, nginx, node, path, ruby, ssh, supervisord, util, znc
 
 env.shell = '/bin/sh -c'
@@ -155,6 +153,7 @@ def deadtree():
 
     nginx.ensure_site('config/nginx/blog.za3k.com', cert='config/certs/blog.za3k.com.pem', key='config/keys/blog.za3k.com.key', domain="blog.za3k.com", letsencrypt=True, csr="config/certs/blog.za3k.com.csr")
 
+
     git.ensure_clone_za3k('za3k_blog', '/var/www/za3k_blog', user='www-data')
     # [Manual] Edit /etc/php5/fpm/php.ini
     # upload_max_filesize = 20M
@@ -210,6 +209,11 @@ def deadtree():
     group_user_ensure('jsfail', 'jsfail')
     nginx.ensure_site('config/nginx/jsfail.com')
     util.put_dir('data/jsfail', '/var/www/jsfail', 'jsfail', mode='755')
+
+    # lexicon.za3k.com
+    # Clone https://github.com/panicsteve/w2wiki to /var/www/lexicon1
+    # Copy previous pages to /var/www/lexicon1/pages
+    nginx.ensure_site('config/nginx/lexicon.za3k.com', cert='config/certs/lexicon.za3k.com.pem', key='config/keys/lexicon.za3k.com.key', domain="lexicon.za3k.com", letsencrypt=True, csr="config/certs/lexicon.za3k.com.csr")
 
     # library.za3k.com -> website
     #                  -> sync script
