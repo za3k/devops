@@ -17,3 +17,34 @@ To generate the .pem files in this directory, concatenate
    # https://www.startssl.com/certs/ca.crt
 
     #cat ${DOMAIN}.crt sca.server1.crt >${DOMAIN}.pem
+
+To install on the remote server,
+    (2) Switch the DNS, and wait for it to propagate
+
+    (3a) use fabric, OR
+    (3b) set up letsencrypt manually
+        (1) Install acme.sh on the remote server, making sure to enable crontab
+        (2) Upload .csr and .pem to /etc/ssl/certs, setting the owner as acme
+            Upload .key to /etc/ssl/private, setting the owner as root
+            chmod 1777 /etc/ssl/certs
+        (3) Set up nginx config. HTTP only, serve well-known dir. Examples in config folder (top part).
+            nginx -t
+            sudo systemctl reload nginx
+        (4)
+            sudo chmod 1777 /var/www/well-known
+                OR
+            sudo chown acme:acme /var/www/well-known
+                OR
+            DOMAIN=...
+            sudo mkdir /var/www/well-known/${DOMAIN}
+            sudo chmod 755 /var/www/well-known/${DOMAIN}
+            sudo chown acme:acme /var/www/well-known/${DOMAIN}
+        (5) Generate acme pem
+            DOMAIN=...
+            sudo -u acme ~acme/.acme.sh/acme.sh --force --signcsr --csr /etc/ssl/certs/${DOMAIN}.csr -w /var/www/well-known/${DOMAIN}
+        (6) Make it so the cert + pem will automatically be installed
+            DOMAIN=...
+            sudo -u acme ~acme/.acme.sh/acme.sh --force --installcert -d ${DOMAIN} --certpath /etc/ssl/certs/${DOMAIN}.letsencrypt.pem --fullchainpath /etc/ssl/certs/${DOMAIN}.pem --renew-hook 'sudo /usr/sbin/nginx -s reload'
+        (6) Switch to full nginx config with HTTPS and reload
+            nginx -t
+            sudo systemctl reload nginx
